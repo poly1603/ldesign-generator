@@ -1,0 +1,48 @@
+import React<% if (lang==='tsx' && props && props.length> 0) { %>, { FC }<% } %> from 'react'
+    <% if (withStyle !==false && styleType) { %>import './<%=kebabCase(componentName)%>.<%= styleType %>'<% } %>
+
+            <% if (lang==='tsx' && props && props.length> 0) { %>
+              interface <%= pascalCase(componentName) %>Props {
+                <% props.forEach(prop=> { %>
+                  <%= prop.name %>
+                    <%= prop.required===false ? '?' : '' %>: <%= prop.type %>
+                        <% }) %>
+                          }
+                          <% } %>
+
+                            /**
+                            * <%= componentName %>
+                              <% if (description) { %> - <%= description %>
+                                  <% } %>
+                                    */
+                                    <% if (lang==='tsx' ) { %>
+                                      export const <%= pascalCase(componentName) %>: FC<<% if (props && props.length> 0)
+                                          { %><%= pascalCase(componentName) %>Props<% } else { %>Record<string, never>
+                                                <% } %>> = (<% if (props && props.length> 0) { %>{ <%= props.map(p=>
+                                                      p.name).join(', ') %> }<% } %>) => {
+                                                        <% } else { %>
+                                                          export function <%= pascalCase(componentName) %>(<% if (props
+                                                              && props.length> 0) { %>{ <%= props.map(p=>
+                                                                p.name).join(', ') %> }<% } %>) {
+                                                                  <% } %>
+                                                                    // TODO: 实现组件逻辑
+
+                                                                    return (
+                                                                    <div className="<%= kebabCase(componentName) %>">
+                                                                      <h2>
+                                                                        <%= componentName %>
+                                                                      </h2>
+                                                                      <% if (props && props.length> 0) { %>
+                                                                        <div className="props">
+                                                                          <% props.forEach(prop=> { %>
+                                                                            <div>
+                                                                              <%= prop.name %>: {<%= prop.name %>}
+                                                                            </div>
+                                                                            <% }) %>
+                                                                        </div>
+                                                                        <% } %>
+                                                                    </div>
+                                                                    )
+                                                                    }
+
+                                                                    export default <%= pascalCase(componentName) %>

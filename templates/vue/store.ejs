@@ -1,0 +1,107 @@
+import { defineStore } from 'pinia'
+<% if (withPersist) { %>import { ref<% } else { %>import { ref, computed<% } %> } from 'vue'
+
+      <% if (state && state.length> 0 && lang === 'ts') { %>
+        interface <%= pascalCase(name) %>State {
+          <% state.forEach(s=> { %>
+            <%= s.name %>: <%= s.type %>
+                <% }) %>
+                  }
+                  <% } %>
+
+                    /**
+                    * <%= name %> Store<% if (description) { %> - <%= description %>
+                          <% } %>
+                            */
+                            export const use<%= pascalCase(name) %>Store = defineStore('<%= kebabCase(name) %>', () => {
+                                // State
+                                <% if (state && state.length> 0) { %>
+                                  <% state.forEach(s=> { %>
+                                    const <%= s.name %> = ref<<%= s.type %>>(<%= s.default !==undefined ? (typeof
+                                          s.default==='string' ? `'${s.default}'` : s.default) : 'null' %>)
+                                          <% }) %>
+                                            <% } else { %>
+                                              const data = ref<any>(null)
+                                                const loading = ref(false)
+                                                const error = ref<Error | null>(null)
+                                                  <% } %>
+
+                                                    // Getters (computed)
+                                                    <% if (state && state.length> 0) { %>
+                                                      const isReady = computed(() => <%= state[0].name %>.value !==
+                                                        null)
+                                                        <% } else { %>
+                                                          const isReady = computed(() => data.value !== null)
+                                                          <% } %>
+
+                                                            // Actions
+                                                            <% if (actions && actions.length> 0) { %>
+                                                              <% actions.forEach(action=> { %>
+                                                                const <%= camelCase(action) %> = async () => {
+                                                                  loading.value = true
+                                                                  error.value = null
+
+                                                                  try {
+                                                                  // TODO: 实现 <%= action %> 逻辑
+                                                                    console.log('Executing <%= action %>')
+                                                                      } catch (e) {
+                                                                      error.value = e as Error
+                                                                      throw e
+                                                                      } finally {
+                                                                      loading.value = false
+                                                                      }
+                                                                      }
+
+                                                                      <% }) %>
+                                                                        <% } else { %>
+                                                                          const fetchData = async () => {
+                                                                          loading.value = true
+                                                                          error.value = null
+
+                                                                          try {
+                                                                          // TODO: 实现数据获取逻辑
+                                                                          await new Promise(resolve =>
+                                                                          setTimeout(resolve, 1000))
+                                                                          data.value = { success: true }
+                                                                          } catch (e) {
+                                                                          error.value = e as Error
+                                                                          throw e
+                                                                          } finally {
+                                                                          loading.value = false
+                                                                          }
+                                                                          }
+
+                                                                          const reset = () => {
+                                                                          data.value = null
+                                                                          loading.value = false
+                                                                          error.value = null
+                                                                          }
+                                                                          <% } %>
+
+                                                                            return {
+                                                                            // state
+                                                                            <% if (state && state.length> 0) { %>
+                                                                              <% state.forEach(s=> { %><%= s.name %>,
+                                                                                  <% }) %>
+                                                                                    <% } else { %>
+                                                                                      data,
+                                                                                      loading,
+                                                                                      error,
+                                                                                      <% } %>
+                                                                                        // getters
+                                                                                        isReady,
+                                                                                        // actions
+                                                                                        <% if (actions &&
+                                                                                          actions.length> 0) { %>
+                                                                                          <% actions.forEach(action=> {
+                                                                                            %><%= camelCase(action) %>,
+                                                                                              <% }) %>
+                                                                                                <% } else { %>
+                                                                                                  fetchData,
+                                                                                                  reset
+                                                                                                  <% } %>
+                                                                                                    }
+                                                                                                    }<% if (withPersist)
+                                                                                                      { %>, {
+                                                                                                      persist: true
+                                                                                                      }<% } %>)

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "success": "Success",
+    "failed": "Failed",
+    "warning": "Warning",
+    "error": "Error",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "completed": "Completed",
+    "name": "Name",
+    "description": "Description",
+    "type": "Type",
+    "path": "Path",
+    "size": "Size",
+    "date": "Date"
+  },
+  "cli": {
+    "welcome": "Welcome to LDesign Generator",
+    "selectOperation": "Please select an operation",
+    "enterName": "Please enter a name",
+    "enterDescription": "Please enter a description (optional)",
+    "selectFramework": "Please select a framework",
+    "selectTemplate": "Please select a template",
+    "selectStyle": "Please select a style type",
+    "withStyle": "Generate style file?",
+    "withTest": "Generate test file?",
+    "withApi": "Generate API calls?",
+    "withStore": "Generate state management?",
+    "outputDir": "Output directory",
+    "generating": "Generating...",
+    "generated": "Generated!",
+    "generatedFiles": "Generated {count} file(s)"
+  },
+  "generator": {
+    "componentGenerated": "Component generated",
+    "pageGenerated": "Page generated",
+    "apiGenerated": "API generated",
+    "storeGenerated": "Store generated",
+    "hookGenerated": "Hook generated",
+    "templateNotFound": "Template file not found: {template}",
+    "generationFailed": "Generation failed: {error}",
+    "fileAlreadyExists": "File already exists: {path}",
+    "invalidConfig": "Invalid configuration",
+    "invalidTemplate": "Invalid template"
+  },
+  "plugin": {
+    "registered": "Plugin registered: {name}",
+    "loaded": "Plugin loaded: {name}",
+    "unloaded": "Plugin unloaded: {name}",
+    "notFound": "Plugin not found: {name}",
+    "alreadyRegistered": "Plugin already registered: {name}",
+    "executionFailed": "Plugin execution failed: {name}"
+  },
+  "validation": {
+    "syntaxError": "Syntax error",
+    "missingField": "Missing required field: {field}",
+    "invalidIndentation": "Inconsistent indentation",
+    "lineTooLong": "Line too long",
+    "missingComments": "Missing comments",
+    "inlineStyle": "Inline style detected",
+    "hardcodedValue": "Hardcoded value detected",
+    "validationPassed": "Validation passed",
+    "validationFailed": "Validation failed: {errors} error(s), {warnings} warning(s)"
+  },
+  "cache": {
+    "hit": "Cache hit",
+    "miss": "Cache miss",
+    "cleared": "Cache cleared",
+    "stats": "Cache stats: hit rate {rate}, size {size}/{capacity}"
+  },
+  "history": {
+    "noHistory": "No history found",
+    "recordAdded": "History record added",
+    "recordDeleted": "History record deleted",
+    "historyCleared": "History cleared",
+    "exported": "History exported: {path}"
+  },
+  "rollback": {
+    "confirm": "Are you sure you want to rollback this operation?",
+    "success": "Rollback successful",
+    "failed": "Rollback failed",
+    "fileModified": "File was modified, skipped: {path}",
+    "fileDeleted": "File deleted: {path}",
+    "backupCreated": "Backup created: {path}"
+  },
+  "batch": {
+    "starting": "Starting batch generation of {count} file(s)",
+    "processing": "Batch generating... ({current}/{total})",
+    "completed": "Batch generation completed! {success}/{total} successful",
+    "partialSuccess": "Batch generation completed, {success}/{total} successful, {failed} failed"
+  },
+  "error": {
+    "unknown": "Unknown error",
+    "fileNotFound": "File not found: {path}",
+    "permissionDenied": "Permission denied",
+    "invalidInput": "Invalid input",
+    "networkError": "Network error",
+    "timeout": "Operation timeout"
+  }
+}
+
+

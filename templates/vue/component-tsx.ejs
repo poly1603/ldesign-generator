@@ -1,0 +1,56 @@
+import { defineComponent<% if (props && props.length> 0) { %>, type PropType<% } %> } from 'vue'
+    <% if (withStyle !==false && styleType) { %>import './<%=kebabCase(componentName)%>.<%= styleType %>'<% } %>
+
+            <% if (props && props.length> 0) { %>
+              interface <%= pascalCase(componentName) %>Props {
+                <% props.forEach(prop=> { %>
+                  <%= prop.name %>
+                    <%= prop.required===false ? '?' : '' %>: <%= prop.type %>
+                        <% }) %>
+                          }
+                          <% } %>
+
+                            <% if (emits && emits.length> 0) { %>
+                              interface <%= pascalCase(componentName) %>Emits {
+                                <% emits.forEach(event=> { %>
+                                  <%= event %>: (payload?: any) => void
+                                    <% }) %>
+                                      }
+                                      <% } %>
+
+                                        /**
+                                        * <%= componentName %>
+                                          <% if (description) { %> - <%= description %>
+                                              <% } %>
+                                                */
+                                                export default defineComponent({
+                                                name: '<%= pascalCase(componentName) %>',
+                                                  <% if (props && props.length> 0) { %>
+                                                    props: {
+                                                    <% props.forEach(prop=> { %>
+                                                      <%= prop.name %>: {
+                                                        type: <%= prop.type %> as PropType<<%= prop.type %>>,
+                                                            <% if (prop.required !==false) { %>required: true,<% } %>
+                                                                <% if (prop.default !==undefined) { %>default: <%=
+                                                                    typeof prop.default==='string' ? `'${prop.default}'`
+                                                                    : prop.default %>,<% } %>
+                                                                      },
+                                                                      <% }) %>
+                                                                        },
+                                                                        <% } %>
+                                                                          <% if (emits && emits.length> 0) { %>
+                                                                            emits: [<%= emits.map(e=> `'${e}'`).join(',
+                                                                              ') %>],
+                                                                              <% } %>
+                                                                                setup(props<% if (emits && emits.length>
+                                                                                  0) { %>, { emit }<% } %>) {
+                                                                                    // TODO: 实现组件逻辑
+
+                                                                                    return () => (
+                                                                                    <div
+                                                                                      class="<%= kebabCase(componentName) %>">
+                                                                                      {/* <%= componentName %> */}
+                                                                                    </div>
+                                                                                    )
+                                                                                    }
+                                                                                    })

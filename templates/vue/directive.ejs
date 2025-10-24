@@ -1,0 +1,64 @@
+import type { Directive, DirectiveBinding } from 'vue'
+
+<% if (lang==='ts' ) { %>
+  interface <%= pascalCase(name) %>Value {
+    // TODO: 定义指令参数类型
+    [key: string]: any
+    }
+    <% } %>
+
+      /**
+      * <%= name %> 指令<% if (description) { %> - <%= description %>
+            <% } %>
+              * @example
+              * <div v-<%=kebabCase(name) %>="value">Content</div>
+              */
+              export const <%= camelCase(name) %>: Directive<% if (lang==='ts' ) { %>
+                  <<%= pascalCase(name) %>Value><% } %> = {
+                      // 在绑定元素的 attribute 或事件监听器被应用之前调用
+                      created(el, binding<% if (lang==='ts' ) { %>: DirectiveBinding<<%= pascalCase(name) %>Value><% }
+                            %>) {
+                            console.log('directive created:', el, binding)
+                            },
+
+                            // 在绑定元素的父组件挂载之前调用
+                            beforeMount(el, binding<% if (lang==='ts' ) { %>: DirectiveBinding<<%= pascalCase(name) %>
+                                Value><% } %>) {
+                                  console.log('directive beforeMount:', el, binding)
+                                  },
+
+                                  // 在绑定元素的父组件挂载之后调用
+                                  mounted(el, binding<% if (lang==='ts' ) { %>: DirectiveBinding<<%= pascalCase(name) %>
+                                      Value><% } %>) {
+                                        // TODO: 实现指令逻辑
+                                        console.log('directive mounted:', el, binding.value)
+                                        },
+
+                                        // 在包含组件的 VNode 更新之前调用
+                                        beforeUpdate(el, binding<% if (lang==='ts' ) { %>: DirectiveBinding<<%=
+                                            pascalCase(name) %>Value><% } %>) {
+                                              console.log('directive beforeUpdate:', el, binding)
+                                              },
+
+                                              // 在包含组件的 VNode 及其子组件的 VNode 更新之后调用
+                                              updated(el, binding<% if (lang==='ts' ) { %>: DirectiveBinding<<%=
+                                                  pascalCase(name) %>Value><% } %>) {
+                                                    console.log('directive updated:', el, binding)
+                                                    },
+
+                                                    // 在绑定元素的父组件卸载之前调用
+                                                    beforeUnmount(el, binding<% if (lang==='ts' ) { %>: DirectiveBinding
+                                                      <<%= pascalCase(name) %>Value><% } %>) {
+                                                          console.log('directive beforeUnmount:', el, binding)
+                                                          },
+
+                                                          // 在绑定元素的父组件卸载之后调用
+                                                          unmounted(el, binding<% if (lang==='ts' ) { %>:
+                                                            DirectiveBinding<<%= pascalCase(name) %>Value><% } %>) {
+                                                                // TODO: 清理逻辑
+                                                                console.log('directive unmounted:', el, binding)
+                                                                }
+                                                                }
+
+                                                                // 默认导出
+                                                                export default <%= camelCase(name) %>

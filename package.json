@@ -1,7 +1,7 @@
 {
   "name": "@ldesign/generator",
-  "version": "0.1.0",
-  "description": "LDesign 代码生成器 - 快速生成组件、页面、配置文件等",
+  "version": "2.0.0",
+  "description": "LDesign 代码生成器 - 功能强大的企业级前端代码生成工具，支持 Vue、React、Angular 等多框架",
   "keywords": [
     "ldesign",
     "generator",

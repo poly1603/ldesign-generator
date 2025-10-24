@@ -1,0 +1,106 @@
+{
+  "common": {
+    "success": "成功",
+    "failed": "失敗",
+    "warning": "警告",
+    "error": "エラー",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "yes": "はい",
+    "no": "いいえ",
+    "loading": "読み込み中...",
+    "processing": "処理中...",
+    "completed": "完了",
+    "name": "名前",
+    "description": "説明",
+    "type": "タイプ",
+    "path": "パス",
+    "size": "サイズ",
+    "date": "日付"
+  },
+  "cli": {
+    "welcome": "LDesign Generator へようこそ",
+    "selectOperation": "操作を選択してください",
+    "enterName": "名前を入力してください",
+    "enterDescription": "説明を入力してください（オプション）",
+    "selectFramework": "フレームワークを選択してください",
+    "selectTemplate": "テンプレートを選択してください",
+    "selectStyle": "スタイルタイプを選択してください",
+    "withStyle": "スタイルファイルを生成しますか？",
+    "withTest": "テストファイルを生成しますか？",
+    "withApi": "API 呼び出しを生成しますか？",
+    "withStore": "状態管理を生成しますか？",
+    "outputDir": "出力ディレクトリ",
+    "generating": "生成中...",
+    "generated": "生成完了！",
+    "generatedFiles": "{count} 個のファイルを生成しました"
+  },
+  "generator": {
+    "componentGenerated": "コンポーネントが生成されました",
+    "pageGenerated": "ページが生成されました",
+    "apiGenerated": "API が生成されました",
+    "storeGenerated": "Store が生成されました",
+    "hookGenerated": "Hook が生成されました",
+    "templateNotFound": "テンプレートファイルが見つかりません: {template}",
+    "generationFailed": "生成失敗: {error}",
+    "fileAlreadyExists": "ファイルが既に存在します: {path}",
+    "invalidConfig": "無効な設定",
+    "invalidTemplate": "無効なテンプレート"
+  },
+  "plugin": {
+    "registered": "プラグインが登録されました: {name}",
+    "loaded": "プラグインが読み込まれました: {name}",
+    "unloaded": "プラグインがアンロードされました: {name}",
+    "notFound": "プラグインが見つかりません: {name}",
+    "alreadyRegistered": "プラグインは既に登録されています: {name}",
+    "executionFailed": "プラグインの実行に失敗しました: {name}"
+  },
+  "validation": {
+    "syntaxError": "構文エラー",
+    "missingField": "必須フィールドがありません: {field}",
+    "invalidIndentation": "インデントが一致しません",
+    "lineTooLong": "行が長すぎます",
+    "missingComments": "コメントがありません",
+    "inlineStyle": "インラインスタイルが検出されました",
+    "hardcodedValue": "ハードコードされた値が検出されました",
+    "validationPassed": "検証に合格しました",
+    "validationFailed": "検証に失敗しました: {errors} エラー、{warnings} 警告"
+  },
+  "cache": {
+    "hit": "キャッシュヒット",
+    "miss": "キャッシュミス",
+    "cleared": "キャッシュがクリアされました",
+    "stats": "キャッシュ統計: ヒット率 {rate}、サイズ {size}/{capacity}"
+  },
+  "history": {
+    "noHistory": "履歴が見つかりません",
+    "recordAdded": "履歴レコードが追加されました",
+    "recordDeleted": "履歴レコードが削除されました",
+    "historyCleared": "履歴がクリアされました",
+    "exported": "履歴がエクスポートされました: {path}"
+  },
+  "rollback": {
+    "confirm": "この操作をロールバックしてもよろしいですか？",
+    "success": "ロールバック成功",
+    "failed": "ロールバック失敗",
+    "fileModified": "ファイルが変更されているため、スキップしました: {path}",
+    "fileDeleted": "ファイルが削除されました: {path}",
+    "backupCreated": "バックアップが作成されました: {path}"
+  },
+  "batch": {
+    "starting": "{count} 個のファイルのバッチ生成を開始します",
+    "processing": "バッチ生成中... ({current}/{total})",
+    "completed": "バッチ生成完了！{success}/{total} 成功",
+    "partialSuccess": "バッチ生成完了、{success}/{total} 成功、{failed} 失敗"
+  },
+  "error": {
+    "unknown": "不明なエラー",
+    "fileNotFound": "ファイルが見つかりません: {path}",
+    "permissionDenied": "権限がありません",
+    "invalidInput": "無効な入力",
+    "networkError": "ネットワークエラー",
+    "timeout": "操作がタイムアウトしました"
+  }
+}
+
+

@@ -1,0 +1,128 @@
+/**
+* <%= name %> 配置<% if (description) { %> - <%= description %>
+      <% } %>
+        */
+
+        <% if (lang==='ts' ) { %>
+          export interface <%= pascalCase(name) %>Config {
+            // 基础配置
+            apiBaseUrl?: string
+            timeout?: number
+            retryCount?: number
+
+            // 功能开关
+            enableCache?: boolean
+            enableLogger?: boolean
+            enableAnalytics?: boolean
+
+            // 自定义配置
+            [key: string]: any
+            }
+            <% } %>
+
+              /**
+              * 默认配置
+              */
+              export const default<%= pascalCase(name) %>Config<% if (lang==='ts' ) { %>: <%= pascalCase(name) %>Config
+                    <% } %> = {
+                      // API 配置
+                      apiBaseUrl: process.env.API_BASE_URL || '/api',
+                      timeout: 10000,
+                      retryCount: 3,
+
+                      // 功能开关
+                      enableCache: true,
+                      enableLogger: process.env.NODE_ENV === 'development',
+                      enableAnalytics: process.env.NODE_ENV === 'production',
+
+                      // TODO: 添加更多配置项
+                      }
+
+                      /**
+                      * 环境变量
+                      */
+                      export const env = {
+                      isDevelopment: process.env.NODE_ENV === 'development',
+                      isProduction: process.env.NODE_ENV === 'production',
+                      isTest: process.env.NODE_ENV === 'test',
+                      apiUrl: process.env.API_URL || 'http://localhost:3000',
+                      // TODO: 添加更多环境变量
+                      }
+
+                      /**
+                      * 常量定义
+                      */
+                      export const constants = {
+                      MAX_RETRY_COUNT: 3,
+                      DEFAULT_PAGE_SIZE: 10,
+                      CACHE_TTL: 5 * 60 * 1000, // 5 minutes
+                      // TODO: 添加更多常量
+                      }
+
+                      /**
+                      * 合并配置
+                      */
+                      export function merge<%= pascalCase(name) %>Config(
+                        userConfig<% if (lang==='ts' ) { %>?: Partial<<%= pascalCase(name) %>Config><% } %>
+                              )<% if (lang==='ts' ) { %>: <%= pascalCase(name) %>Config<% } %> {
+                                    return {
+                                    ...default<%= pascalCase(name) %>Config,
+                                      ...userConfig
+                                      }
+                                      }
+
+                                      /**
+                                      * 验证配置
+                                      */
+                                      export function validate<%= pascalCase(name) %>Config(
+                                        config<% if (lang==='ts' ) { %>: <%= pascalCase(name) %>Config<% } %>
+                                              )<% if (lang==='ts' ) { %>: boolean<% } %> {
+                                                  // TODO: 实现配置验证逻辑
+                                                  if (!config.apiBaseUrl) {
+                                                  console.error('apiBaseUrl is required')
+                                                  return false
+                                                  }
+
+                                                  if (config.timeout && config.timeout < 0) { console.error('timeout
+                                                    must be positive') return false } return true } // 导出配置实例 let
+                                                    configInstance<% if (lang==='ts' ) { %>: <%= pascalCase(name) %>
+                                                      Config<% } %> = default<%= pascalCase(name) %>Config
+
+                                                          /**
+                                                          * 获取配置
+                                                          */
+                                                          export function get<%= pascalCase(name) %>Config()<% if
+                                                              (lang==='ts' ) { %>: <%= pascalCase(name) %>Config<% } %>
+                                                                  {
+                                                                  return configInstance
+                                                                  }
+
+                                                                  /**
+                                                                  * 设置配置
+                                                                  */
+                                                                  export function set<%= pascalCase(name) %>Config(
+                                                                    config<% if (lang==='ts' ) { %>: Partial<<%=
+                                                                        pascalCase(name) %>Config><% } %>
+                                                                          )<% if (lang==='ts' ) { %>: void<% } %> {
+                                                                              configInstance = merge<%= pascalCase(name)
+                                                                                %>Config(config)
+
+                                                                                if (!validate<%= pascalCase(name) %>
+                                                                                  Config(configInstance)) {
+                                                                                  console.warn('Invalid configuration
+                                                                                  provided')
+                                                                                  }
+                                                                                  }
+
+                                                                                  export default {
+                                                                                  default<%= pascalCase(name) %>Config,
+                                                                                    env,
+                                                                                    constants,
+                                                                                    merge<%= pascalCase(name) %>Config,
+                                                                                      validate<%= pascalCase(name) %>
+                                                                                        Config,
+                                                                                        get<%= pascalCase(name) %>
+                                                                                          Config,
+                                                                                          set<%= pascalCase(name) %>
+                                                                                            Config
+                                                                                            }

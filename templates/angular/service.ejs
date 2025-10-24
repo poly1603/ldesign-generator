@@ -1,0 +1,155 @@
+import { Injectable } from '@angular/core'
+import { HttpClient<% if (withTypes) { %>, HttpParams<% } %> } from '@angular/common/http'
+    import { Observable<% if (withTypes) { %>, throwError<% } %> } from 'rxjs'
+        import { catchError<% if (retry) { %>, retry<% } %>, map } from 'rxjs/operators'
+            <% if (withTypes) { %>import { <%= pascalCase(name) %>, <%= pascalCase(name) %>ListResponse } from './<%=
+                    kebabCase(name) %>.model'<% } %>
+
+                      /**
+                      * <%= pascalCase(name) %>Service<% if (description) { %> - <%= description %>
+                            <% } %>
+                              */
+                              @Injectable({
+                              providedIn: '<%= providedIn || 'root' %>'
+                                })
+                                export class <%= pascalCase(name) %>Service {
+                                  private apiUrl = '<%= apiUrl || '/api' %>/<%= kebabCase(name) %>'
+
+                                      constructor(private http: HttpClient) { }
+
+                                      /**
+                                      * 获取列表
+                                      */
+                                      getList(params?: any): Observable<<% if (withTypes) { %>
+                                        <%= pascalCase(name) %>ListResponse<% } else { %>any<% } %>> {
+                                              <% if (withTypes) { %>
+                                                const httpParams = new HttpParams({ fromObject: params || {} })
+                                                return this.http.get<<%= pascalCase(name) %>ListResponse>(this.apiUrl, {
+                                                  params: httpParams })
+                                                  <% } else { %>
+                                                    return this.http.get(this.apiUrl, { params })
+                                                    <% } %>
+                                                      .pipe(
+                                                      <% if (retry) { %>retry(3),<% } %>
+                                                          catchError(this.handleError)
+                                                          )
+                                                          }
+
+                                                          /**
+                                                          * 获取详情
+                                                          */
+                                                          getDetail(id: string): Observable<<% if (withTypes) { %>
+                                                            <%= pascalCase(name) %>
+                                                              <% } else { %>any<% } %>> {
+                                                                  return this.http.get<% if (withTypes) { %>
+                                                                    <<%= pascalCase(name) %>><% } %>
+                                                                        (`${this.apiUrl}/${id}`)
+                                                                        .pipe(
+                                                                        <% if (retry) { %>retry(3),<% } %>
+                                                                            catchError(this.handleError)
+                                                                            )
+                                                                            }
+
+                                                                            /**
+                                                                            * 创建
+                                                                            */
+                                                                            create(data: <% if (withTypes) { %>Partial
+                                                                              <<%= pascalCase(name) %>><% } else { %>any
+                                                                                  <% } %>): Observable<<% if (withTypes)
+                                                                                      { %>
+                                                                                      <%= pascalCase(name) %>
+                                                                                        <% } else { %>any<% } %>> {
+                                                                                            return this.http.post<% if
+                                                                                              (withTypes) { %>
+                                                                                              <<%= pascalCase(name) %>>
+                                                                                                <% } %>(this.apiUrl,
+                                                                                                  data)
+                                                                                                  .pipe(catchError(this.handleError))
+                                                                                                  }
+
+                                                                                                  /**
+                                                                                                  * 更新
+                                                                                                  */
+                                                                                                  update(id: string,
+                                                                                                  data: <% if
+                                                                                                    (withTypes) { %>
+                                                                                                    Partial<<%=
+                                                                                                      pascalCase(name)
+                                                                                                      %>><% } else { %>
+                                                                                                        any<% } %>):
+                                                                                                          Observable<<%
+                                                                                                            if
+                                                                                                            (withTypes)
+                                                                                                            { %>
+                                                                                                            <%=
+                                                                                                              pascalCase(name)
+                                                                                                              %>
+                                                                                                              <% } else
+                                                                                                                { %>any
+                                                                                                                <% } %>>
+                                                                                                                  {
+                                                                                                                  return
+                                                                                                                  this.http.put
+                                                                                                                  <% if
+                                                                                                                    (withTypes)
+                                                                                                                    { %>
+                                                                                                                    <<%=
+                                                                                                                      pascalCase(name)
+                                                                                                                      %>
+                                                                                                                      >
+                                                                                                                      <% }
+                                                                                                                        %>
+                                                                                                                        (`${this.apiUrl}/${id}`,
+                                                                                                                        data)
+                                                                                                                        .pipe(catchError(this.handleError))
+                                                                                                                        }
+
+                                                                                                                        /**
+                                                                                                                        *
+                                                                                                                        删除
+                                                                                                                        */
+                                                                                                                        delete(id:
+                                                                                                                        string):
+                                                                                                                        Observable
+                                                                                                                        <any>
+                                                                                                                          {
+                                                                                                                          return
+                                                                                                                          this.http.delete(`${this.apiUrl}/${id}`)
+                                                                                                                          .pipe(catchError(this.handleError))
+                                                                                                                          }
+
+                                                                                                                          /**
+                                                                                                                          *
+                                                                                                                          错误处理
+                                                                                                                          */
+                                                                                                                          private
+                                                                                                                          handleError(error:
+                                                                                                                          any):
+                                                                                                                          Observable
+                                                                                                                          <never>
+                                                                                                                            {
+                                                                                                                            console.error('API
+                                                                                                                            Error:',
+                                                                                                                            error)
+                                                                                                                            <% if
+                                                                                                                              (withTypes)
+                                                                                                                              {
+                                                                                                                              %>
+                                                                                                                              return
+                                                                                                                              throwError(()
+                                                                                                                              =>
+                                                                                                                              new
+                                                                                                                              Error(error.message
+                                                                                                                              ||
+                                                                                                                              'Server
+                                                                                                                              error'))
+                                                                                                                              <% }
+                                                                                                                                else
+                                                                                                                                {
+                                                                                                                                %>
+                                                                                                                                throw
+                                                                                                                                error
+                                                                                                                                <% }
+                                                                                                                                  %>
+                                                                                                                                  }
+                                                                                                                                  }

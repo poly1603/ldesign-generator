@@ -1,0 +1,33 @@
+<div class="<%= kebabCase(name) %>">
+  <% if (description) { %><!-- <%= description %> -->
+    <% } %>
+
+      <div class="header">
+        <h2>
+          <%= pascalCase(name) %>
+        </h2>
+      </div>
+
+      <div class="content">
+        <% if (loading) { %>
+          <div *ngIf="loading" class="loading">
+            Loading...
+          </div>
+          <% } %>
+
+            <div *ngIf="!loading && data" class="data-container">
+              <!-- TODO: 添加内容 -->
+              <pre>{{ data | json }}</pre>
+            </div>
+
+            <div *ngIf="!loading && !data" class="empty">
+              暂无数据
+            </div>
+      </div>
+
+      <% if (emits && emits.length> 0) { %>
+        <div class="actions">
+          <button (click)="handleAction()">执行操作</button>
+        </div>
+        <% } %>
+</div>

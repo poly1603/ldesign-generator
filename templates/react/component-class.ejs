@@ -1,0 +1,121 @@
+import React, { Component } from 'react'
+<% if (withStyle !==false && styleType) { %>import './<%=kebabCase(componentName)%>.<%= styleType %>'<% } %>
+
+        <% if (lang==='tsx' && props && props.length> 0) { %>
+          interface <%= pascalCase(componentName) %>Props {
+            <% props.forEach(prop=> { %>
+              <%= prop.name %>
+                <%= prop.required===false ? '?' : '' %>: <%= prop.type %>
+                    <% }) %>
+                      }
+                      <% } %>
+
+                        <% if (lang==='tsx' ) { %>
+                          interface <%= pascalCase(componentName) %>State {
+                            // TODO: 定义状态类型
+                            count: number
+                            }
+                            <% } %>
+
+                              /**
+                              * <%= componentName %>
+                                <% if (description) { %> - <%= description %>
+                                    <% } %>
+                                      */
+                                      export class <%= pascalCase(componentName) %> extends Component<<% if
+                                          (lang==='tsx' ) { %>
+                                          <% if (props && props.length> 0) { %><%= pascalCase(componentName) %>Props<% }
+                                                else { %>Record<string, never>
+                                                  <% } %>, <%= pascalCase(componentName) %>State<% } %>> {
+                                                        <% if (props && props.length> 0) { %>
+                                                          static defaultProps = {
+                                                          <% props.filter(p=> p.default !== undefined).forEach((prop,
+                                                            index, arr) => { %>
+                                                            <%= prop.name %>: <%= typeof prop.default==='string' ?
+                                                                `'${prop.default}'` : prop.default %>
+                                                                <%= index < arr.length - 1 ? ',' : '' %>
+                                                                  <% }) %>
+                                                                    }
+                                                                    <% } %>
+
+                                                                      constructor(props<% if (lang==='tsx' ) { %>: <%=
+                                                                          props && props.length> 0 ?
+                                                                          `${pascalCase(componentName)}Props` : 'Record
+                                                                          <string, never>' %><% } %>) {
+                                                                              super(props)
+                                                                              this.state = {
+                                                                              count: 0
+                                                                              }
+                                                                              }
+
+                                                                              componentDidMount() {
+                                                                              // TODO: 组件挂载后的逻辑
+                                                                              }
+
+                                                                              componentDidUpdate(prevProps<% if
+                                                                                (lang==='tsx' ) { %>: <%= props &&
+                                                                                  props.length> 0 ?
+                                                                                  `${pascalCase(componentName)}Props` :
+                                                                                  'Record<string, never>' %><% } %>,
+                                                                                      prevState<% if (lang==='tsx' ) {
+                                                                                        %>: <%=
+                                                                                          pascalCase(componentName) %>
+                                                                                          State<% } %>) {
+                                                                                            // TODO: 组件更新后的逻辑
+                                                                                            }
+
+                                                                                            componentWillUnmount() {
+                                                                                            // TODO: 组件卸载前的清理逻辑
+                                                                                            }
+
+                                                                                            handleIncrement = () => {
+                                                                                            this.setState(state => ({
+                                                                                            count: state.count + 1 }))
+                                                                                            }
+
+                                                                                            render() {
+                                                                                            const { count } = this.state
+                                                                                            <% if (props &&
+                                                                                              props.length> 0) { %>
+                                                                                              const { <%= props.map(p=>
+                                                                                                p.name).join(', ') %> }
+                                                                                                = this.props
+                                                                                                <% } %>
+
+                                                                                                  return (
+                                                                                                  <div
+                                                                                                    className="<%= kebabCase(componentName) %>">
+                                                                                                    <h2>
+                                                                                                      <%= componentName
+                                                                                                        %>
+                                                                                                    </h2>
+                                                                                                    <p>Count: {count}
+                                                                                                    </p>
+                                                                                                    <button
+                                                                                                      onClick={this.handleIncrement}>Increment</button>
+                                                                                                    <% if (props &&
+                                                                                                      props.length> 0) {
+                                                                                                      %>
+                                                                                                      <div
+                                                                                                        className="props">
+                                                                                                        <%
+                                                                                                          props.forEach(prop=>
+                                                                                                          { %>
+                                                                                                          <div>
+                                                                                                            <%=
+                                                                                                              prop.name
+                                                                                                              %>: {<%=
+                                                                                                                prop.name
+                                                                                                                %>}
+                                                                                                          </div>
+                                                                                                          <% }) %>
+                                                                                                      </div>
+                                                                                                      <% } %>
+                                                                                                  </div>
+                                                                                                  )
+                                                                                                  }
+                                                                                                  }
+
+                                                                                                  export default <%=
+                                                                                                    pascalCase(componentName)
+                                                                                                    %>

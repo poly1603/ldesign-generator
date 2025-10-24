@@ -1,0 +1,94 @@
+/**
+* <%= name %> Mock 数据<% if (description) { %> - <%= description %>
+      <% } %>
+        */
+
+        /**
+        * 单个数据项
+        */
+        export const mock<%= pascalCase(name) %>
+          <% if (lang==='ts' ) { %>: any<% } %> = {
+              id: '1',
+              name: 'Mock <%= name %>',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                // TODO: 添加更多字段
+                }
+
+                /**
+                * 数据列表
+                */
+                export const mock<%= pascalCase(name) %>List<% if (lang==='ts' ) { %>: any[]<% } %> = Array.from({
+                      length: 10 }, (_, i) => ({
+                      id: String(i + 1),
+                      name: `Mock <%= name %> ${i + 1}`,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        // TODO: 添加更多字段
+                        }))
+
+                        /**
+                        * 分页数据
+                        */
+                        export const mock<%= pascalCase(name) %>Page<% if (lang==='ts' ) { %>: any<% } %> = {
+                              data: mock<%= pascalCase(name) %>List.slice(0, 5),
+                                total: mock<%= pascalCase(name) %>List.length,
+                                  page: 1,
+                                  pageSize: 5
+                                  }
+
+                                  /**
+                                  * 生成随机数据
+                                  */
+                                  export function generateMock<%= pascalCase(name) %>(count<% if (lang==='ts' ) { %>:
+                                      number<% } %> = 1)<% if (lang==='ts' ) { %>: any[]<% } %> {
+                                            return Array.from({ length: count }, (_, i) => ({
+                                            id: `generated-${i + 1}`,
+                                            name: `Generated <%= name %> ${i + 1}`,
+                                              createdAt: new Date().toISOString(),
+                                              updatedAt: new Date().toISOString(),
+                                              // TODO: 添加更多随机字段
+                                              }))
+                                              }
+
+                                              /**
+                                              * Mock API 响应
+                                              */
+                                              export const mock<%= pascalCase(name) %>Responses = {
+                                                getList: () => Promise.resolve(mock<%= pascalCase(name) %>Page),
+                                                  getDetail: (id<% if (lang==='ts' ) { %>: string<% } %>) =>
+                                                      Promise.resolve(mock<%= pascalCase(name) %>List.find(item =>
+                                                        item.id === id)),
+                                                        create: (data<% if (lang==='ts' ) { %>: any<% } %>) =>
+                                                            Promise.resolve({ ...data, id: String(Date.now()) }),
+                                                            update: (id<% if (lang==='ts' ) { %>: string<% } %>, data<%
+                                                                  if (lang==='ts' ) { %>: any<% } %>) =>
+                                                                    Promise.resolve({ ...data, id }),
+                                                                    remove: (id<% if (lang==='ts' ) { %>: string<% } %>)
+                                                                        => Promise.resolve({ success: true, id })
+                                                                        }
+
+                                                                        /**
+                                                                        * 延迟响应（模拟网络延迟）
+                                                                        */
+                                                                        export function delayedResponse<T>(data: T,
+                                                                          delay<% if (lang==='ts' ) { %>: number<% } %>
+                                                                              = 500)<% if (lang==='ts' ) { %>: Promise
+                                                                                <T>
+                                                                                  <% } %> {
+                                                                                    return new Promise(resolve => {
+                                                                                    setTimeout(() => resolve(data),
+                                                                                    delay)
+                                                                                    })
+                                                                                    }
+
+                                                                                    export default {
+                                                                                    mock<%= pascalCase(name) %>,
+                                                                                      mock<%= pascalCase(name) %>List,
+                                                                                        mock<%= pascalCase(name) %>Page,
+                                                                                          generateMock<%=
+                                                                                            pascalCase(name) %>,
+                                                                                            mock<%= pascalCase(name) %>
+                                                                                              Responses,
+                                                                                              delayedResponse
+                                                                                              }

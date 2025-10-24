@@ -1,0 +1,51 @@
+import { Directive, ElementRef, HostListener, Input<% if (renderer) { %>, Renderer2<% } %> } from '@angular/core'
+
+    /**
+    * <%= pascalCase(name) %>Directive<% if (description) { %> - <%= description %>
+          <% } %>
+            * @example
+            * <div app<%=pascalCase(name) %>="value">Content</div>
+            */
+            @Directive({
+            selector: '[app<%= pascalCase(name) %>]'<% if (standalone) { %>,
+                standalone: true<% } %>
+                  })
+                  export class <%= pascalCase(name) %>Directive {
+                    @Input('app<%= pascalCase(name) %>') config: any
+
+                      constructor(
+                      private el: ElementRef<% if (renderer) { %>,
+                        private renderer: Renderer2<% } %>
+                          ) { }
+
+                          ngOnInit(): void {
+                          // TODO: 初始化指令逻辑
+                          console.log('Directive initialized with config:', this.config)
+                          this.applyDirective()
+                          }
+
+                          @HostListener('click', ['$event'])
+                          onClick(event: MouseEvent): void {
+                          // TODO: 处理点击事件
+                          console.log('Element clicked:', event)
+                          }
+
+                          @HostListener('mouseenter')
+                          onMouseEnter(): void {
+                          // TODO: 处理鼠标进入事件
+                          }
+
+                          @HostListener('mouseleave')
+                          onMouseLeave(): void {
+                          // TODO: 处理鼠标离开事件
+                          }
+
+                          private applyDirective(): void {
+                          // TODO: 应用指令效果
+                          <% if (renderer) { %>
+                            this.renderer.setStyle(this.el.nativeElement, 'cursor', 'pointer')
+                            <% } else { %>
+                              this.el.nativeElement.style.cursor = 'pointer'
+                              <% } %>
+                                }
+                                }

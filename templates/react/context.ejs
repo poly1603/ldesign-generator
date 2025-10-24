@@ -1,0 +1,86 @@
+import React, { createContext, useContext, useState<% if (async) { %>, useEffect<% } %> } from 'react'
+
+    <% if (lang==='tsx' ) { %>
+      interface <%= pascalCase(name) %>State {
+        // TODO: 定义状态类型
+        [key: string]: any
+        }
+
+        interface <%= pascalCase(name) %>ContextValue {
+          state: <%= pascalCase(name) %>State
+            setState: React.Dispatch<React.SetStateAction<<%= pascalCase(name) %>State>>
+              // TODO: 添加其他方法
+              }
+
+              interface <%= pascalCase(name) %>ProviderProps {
+                children: React.ReactNode
+                initialState?: Partial<<%= pascalCase(name) %>State>
+                  }
+                  <% } %>
+
+                    /**
+                    * <%= name %> Context<% if (description) { %> - <%= description %>
+                          <% } %>
+                            */
+                            const <%= pascalCase(name) %>Context = createContext<% if (lang==='tsx' ) { %>
+                                <<%= pascalCase(name) %>ContextValue | undefined><% } %>(undefined)
+
+                                    /**
+                                    * <%= name %> Provider
+                                      */
+                                      export const <%= pascalCase(name) %>Provider<% if (lang==='tsx' ) { %>: React.FC
+                                          <<%= pascalCase(name) %>ProviderProps><% } %> = ({ children, initialState = {}
+                                              }) => {
+                                              const [state, setState] = useState<% if (lang==='tsx' ) { %>
+                                                <<%= pascalCase(name) %>State><% } %>({
+                                                    // 默认状态
+                                                    ...initialState
+                                                    })
+
+                                                    <% if (async) { %>
+                                                      useEffect(() => {
+                                                      // 初始化逻辑
+                                                      const initialize = async () => {
+                                                      try {
+                                                      // TODO: 实现初始化逻辑
+                                                      console.log('Initializing <%= name %> context')
+                                                        } catch (error) {
+                                                        console.error('Initialization failed:', error)
+                                                        }
+                                                        }
+
+                                                        initialize()
+                                                        }, [])
+                                                        <% } %>
+
+                                                          const value<% if (lang==='tsx' ) { %>: <%= pascalCase(name) %>
+                                                              ContextValue<% } %> = {
+                                                                state,
+                                                                setState
+                                                                // TODO: 添加其他方法
+                                                                }
+
+                                                                return (
+                                                                <<%= pascalCase(name) %>Context.Provider value={value}>
+                                                                  {children}
+                                                                </<%= pascalCase(name) %>Context.Provider>
+                                                                )
+                                                                }
+
+                                                                /**
+                                                                * use<%= pascalCase(name) %> Hook
+                                                                  */
+                                                                  export const use<%= pascalCase(name) %> = () => {
+                                                                    const context = useContext(<%= pascalCase(name) %>
+                                                                      Context)
+
+                                                                      if (context === undefined) {
+                                                                      throw new Error('use<%= pascalCase(name) %> must
+                                                                        be used within a <%= pascalCase(name) %>
+                                                                          Provider')
+                                                                          }
+
+                                                                          return context
+                                                                          }
+
+                                                                          export default <%= pascalCase(name) %>Provider

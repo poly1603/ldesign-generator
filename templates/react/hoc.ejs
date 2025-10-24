@@ -1,0 +1,62 @@
+import React<% if (lang==='tsx' ) { %>, { ComponentType }<% } %> from 'react'
+
+    <% if (lang==='tsx' ) { %>
+      interface <%= pascalCase(name) %>Options {
+        // TODO: 定义 HOC 选项类型
+        [key: string]: any
+        }
+
+        interface Injected<%= pascalCase(name) %>Props {
+          // TODO: 定义注入的 props 类型
+          [key: string]: any
+          }
+          <% } %>
+
+            /**
+            * <%= name %> HOC<% if (description) { %> - <%= description %>
+                  <% } %>
+                    * @param {Object} options - HOC 配置选项
+                    * @example
+                    * const EnhancedComponent = <%= camelCase(name) %>(MyComponent, options)
+                      */
+                      export function <%= camelCase(name) %>
+                        <% if (lang==='tsx' ) { %>
+                          <P extends object={}>
+                            <% } %>(
+                              WrappedComponent<% if (lang==='tsx' ) { %>: ComponentType<P & Injected<%=pascalCase(name)
+                                  %>Props><% } %>,
+                                    options<% if (lang==='tsx' ) { %>?: <%= pascalCase(name) %>Options<% } %> = {}
+                                          )<% if (lang==='tsx' ) { %>: ComponentType<P>
+                                              <% } %> {
+                                                const displayName = WrappedComponent.displayName ||
+                                                WrappedComponent.name || 'Component'
+
+                                                const <%= pascalCase(name) %>HOC<% if (lang==='tsx' ) { %>: React.FC<P>
+                                                      <% } %> = (props) => {
+                                                        // TODO: 实现 HOC 逻辑
+                                                        console.log('HOC options:', options)
+
+                                                        // 添加额外的 props
+                                                        const injectedProps<% if (lang==='tsx' ) { %>: Injected<%=
+                                                            pascalCase(name) %>Props<% } %> = {
+                                                              // TODO: 定义注入的 props
+                                                              }
+
+                                                              // 合并 props
+                                                              const combinedProps = {
+                                                              ...props,
+                                                              ...injectedProps
+                                                              }
+
+                                                              return <WrappedComponent {...combinedProps<% if
+                                                                (lang==='tsx' ) { %> as P & Injected<%= pascalCase(name)
+                                                                  %>Props<% } %>} />
+                                                                    }
+
+                                                                    <%= pascalCase(name) %>HOC.displayName = `<%=
+                                                                        camelCase(name) %>(${displayName})`
+
+                                                                        return <%= pascalCase(name) %>HOC
+                                                                          }
+
+                                                                          export default <%= camelCase(name) %>

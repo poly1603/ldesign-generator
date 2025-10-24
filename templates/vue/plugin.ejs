@@ -1,0 +1,35 @@
+import type { App, Plugin } from 'vue'
+
+<% if (lang==='ts' ) { %>
+  interface <%= pascalCase(name) %>Options {
+    // TODO: 定义插件配置选项
+    [key: string]: any
+    }
+    <% } %>
+
+      /**
+      * <%= name %> 插件<% if (description) { %> - <%= description %>
+            <% } %>
+              */
+              export const <%= pascalCase(name) %>: Plugin = {
+                install(app: App, options<% if (lang==='ts' ) { %>?: <%= pascalCase(name) %>Options<% } %>) {
+                      console.log('Installing <%= name %> plugin with options:', options)
+
+                        // 注册全局组件
+                        // app.component('ComponentName', Component)
+
+                        // 注册全局指令
+                        // app.directive('directiveName', directive)
+
+                        // 提供全局数据
+                        // app.provide('key', value)
+
+                        // 添加全局属性
+                        // app.config.globalProperties.$<%= camelCase(name) %> = {}
+
+                          // TODO: 实现插件逻辑
+                          }
+                          }
+
+                          // 默认导出
+                          export default <%= pascalCase(name) %>

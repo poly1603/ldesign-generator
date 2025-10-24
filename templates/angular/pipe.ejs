@@ -1,0 +1,39 @@
+import { Pipe, PipeTransform } from '@angular/core'
+
+/**
+* <%= pascalCase(name) %>Pipe<% if (description) { %> - <%= description %>
+      <% } %>
+        * @example
+        * {{ value | <%= camelCase(name) %> }}
+          * {{ value | <%= camelCase(name) %>:arg1:arg2 }}
+            */
+            @Pipe({
+            name: '<%= camelCase(name) %>'<% if (standalone) { %>,
+                standalone: true<% } %>
+                  <% if (pure===false) { %>,
+                    pure: false<% } %>
+                      })
+                      export class <%= pascalCase(name) %>Pipe implements PipeTransform {
+                        /**
+                        * 转换值
+                        * @param value - 输入值
+                        * @param args - 可选参数
+                        * @returns 转换后的值
+                        */
+                        transform(value: any, ...args: any[]): any {
+                        // TODO: 实现转换逻辑
+
+                        if (value === null || value === undefined) {
+                        return value
+                        }
+
+                        console.log('Pipe transform:', value, args)
+
+                        // 示例: 转换为大写
+                        if (typeof value === 'string') {
+                        return value.toUpperCase()
+                        }
+
+                        return value
+                        }
+                        }

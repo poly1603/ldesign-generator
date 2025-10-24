@@ -1,0 +1,108 @@
+import { useState<% if (async) { %>, useEffect, useCallback<% } %> } from 'react'
+
+    <% if (params && params.length> 0 && lang === 'tsx') { %>
+      interface <%= pascalCase(name) %>Params {
+        <% params.forEach(param=> { %>
+          <%= param.name %>: <%= param.type %>
+              <% }) %>
+                }
+                <% } %>
+
+                  <% if (returns && lang==='tsx' ) { %>
+                    interface <%= pascalCase(name) %>Return {
+                      <%= returns %>
+                        }
+                        <% } %>
+
+                          /**
+                          * <%= name %>
+                            <% if (description) { %> - <%= description %>
+                                <% } %>
+                                  <% if (params && params.length> 0) { %>* @param {<%= params.map(p=> p.type).join(', ')
+                                      %>} params - 参数对象<% } %>
+                                        * @returns {<%= returns || 'object' %>} 返回对象
+                                          */
+                                          export function <%= camelCase(name) %>(<% if (params && params.length> 0) {
+                                              %>params<% if (lang==='tsx' ) { %>: <%= pascalCase(name) %>Params<% } %>
+                                                    <% } %>)<% if (lang==='tsx' && returns) { %>: <%= pascalCase(name)
+                                                          %>Return<% } %> {
+                                                            const [loading, setLoading] = useState(false)
+                                                            const [error, setError] = useState<% if (lang==='tsx' ) { %>
+                                                              <Error | null>
+                                                                <% } %>(null)
+                                                                  const [data, setData] = useState<% if (lang==='tsx' )
+                                                                    { %>
+                                                                    <any>
+                                                                      <% } %>(null)
+
+                                                                        <% if (async) { %>
+                                                                          const execute = useCallback(async () => {
+                                                                          setLoading(true)
+                                                                          setError(null)
+
+                                                                          try {
+                                                                          // TODO: 实现异步逻辑
+                                                                          <% if (params && params.length> 0) { %>
+                                                                            console.log('Parameters:', params)
+                                                                            <% } %>
+
+                                                                              // 模拟异步请求
+                                                                              await new Promise(resolve =>
+                                                                              setTimeout(resolve, 1000))
+
+                                                                              const result = { success: true }
+                                                                              setData(result)
+                                                                              return result
+                                                                              } catch (e) {
+                                                                              const err = e as Error
+                                                                              setError(err)
+                                                                              throw err
+                                                                              } finally {
+                                                                              setLoading(false)
+                                                                              }
+                                                                              }, [<% if (params && params.length> 0) {
+                                                                                %><%= params.map(p=>
+                                                                                  `params.${p.name}`).join(', ') %><% }
+                                                                                    %>])
+
+                                                                                    useEffect(() => {
+                                                                                    // 可以在这里执行初始化逻辑
+                                                                                    }, [])
+                                                                                    <% } else { %>
+                                                                                      const execute = useCallback(() =>
+                                                                                      {
+                                                                                      // TODO: 实现逻辑
+                                                                                      <% if (params && params.length> 0)
+                                                                                        { %>
+                                                                                        console.log('Parameters:',
+                                                                                        params)
+                                                                                        <% } %>
+                                                                                          }, [<% if (params &&
+                                                                                            params.length> 0) { %><%=
+                                                                                              params.map(p=>
+                                                                                              `params.${p.name}`).join(',
+                                                                                              ') %><% } %>])
+                                                                                                <% } %>
+
+                                                                                                  const reset =
+                                                                                                  useCallback(() => {
+                                                                                                  setLoading(false)
+                                                                                                  setError(null)
+                                                                                                  setData(null)
+                                                                                                  }, [])
+
+                                                                                                  return {
+                                                                                                  loading,
+                                                                                                  error,
+                                                                                                  data,
+                                                                                                  <% if (async) { %>
+                                                                                                    isReady: !loading &&
+                                                                                                    !error,<% } %>
+                                                                                                      execute,
+                                                                                                      reset
+                                                                                                      }
+                                                                                                      }
+
+                                                                                                      export default <%=
+                                                                                                        camelCase(name)
+                                                                                                        %>

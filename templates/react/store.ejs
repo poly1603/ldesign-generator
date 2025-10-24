@@ -1,0 +1,511 @@
+<% if (type==='zustand' ) { %>import { create } from 'zustand'
+  <% if (withPersist) { %>import { persist } from 'zustand/middleware'<% } %>
+
+      <% if (lang==='tsx' && state && state.length> 0) { %>
+        interface <%= pascalCase(name) %>State {
+          <% state.forEach(s=> { %>
+            <%= s.name %>: <%= s.type %>
+                <% }) %>
+                  }
+
+                  interface <%= pascalCase(name) %>Actions {
+                    <% if (actions && actions.length> 0) { %>
+                      <% actions.forEach(action=> { %>
+                        <%= camelCase(action) %>: () => Promise<void>
+                            <% }) %>
+                              <% } else { %>
+                                fetchData: () => Promise<void>
+                                  reset: () => void
+                                  <% } %>
+                                    }
+
+                                    type <%= pascalCase(name) %>Store = <%= pascalCase(name) %>State & <%=
+                                          pascalCase(name) %>Actions
+                                          <% } %>
+
+                                            /**
+                                            * <%= name %> Store<% if (description) { %> - <%= description %>
+                                                  <% } %>
+                                                    */
+                                                    export const use<%= pascalCase(name) %>Store = create<% if
+                                                        (withPersist) { %>(persist<% } %>
+                                                          <<% if (lang==='tsx' ) { %>
+                                                            <%= pascalCase(name) %>Store<% } %>>(
+                                                                (set, get) => ({
+                                                                // State
+                                                                <% if (state && state.length> 0) { %>
+                                                                  <% state.forEach(s=> { %>
+                                                                    <%= s.name %>: <%= s.default !==undefined ? (typeof
+                                                                        s.default==='string' ? `'${s.default}'` :
+                                                                        s.default) : 'null' %>,
+                                                                        <% }) %>
+                                                                          <% } else { %>
+                                                                            data: null,
+                                                                            loading: false,
+                                                                            error: null,
+                                                                            <% } %>
+
+                                                                              // Actions
+                                                                              <% if (actions && actions.length> 0) { %>
+                                                                                <% actions.forEach(action=> { %>
+                                                                                  <%= camelCase(action) %>: async () =>
+                                                                                    {
+                                                                                    set({ loading: true, error: null })
+
+                                                                                    try {
+                                                                                    // TODO: 实现 <%= action %> 逻辑
+                                                                                      console.log('Executing <%= action
+                                                                                        %>')
+
+                                                                                        // 更新状态
+                                                                                        set({ loading: false })
+                                                                                        } catch (error) {
+                                                                                        set({ error: error as Error,
+                                                                                        loading: false })
+                                                                                        throw error
+                                                                                        }
+                                                                                        },
+
+                                                                                        <% }) %>
+                                                                                          <% } else { %>
+                                                                                            fetchData: async () => {
+                                                                                            set({ loading: true, error:
+                                                                                            null })
+
+                                                                                            try {
+                                                                                            // TODO: 实现数据获取逻辑
+                                                                                            await new Promise(resolve =>
+                                                                                            setTimeout(resolve, 1000))
+                                                                                            set({ data: { success: true
+                                                                                            }, loading: false })
+                                                                                            } catch (error) {
+                                                                                            set({ error: error as Error,
+                                                                                            loading: false })
+                                                                                            throw error
+                                                                                            }
+                                                                                            },
+
+                                                                                            reset: () => {
+                                                                                            set({
+                                                                                            data: null,
+                                                                                            loading: false,
+                                                                                            error: null
+                                                                                            })
+                                                                                            }
+                                                                                            <% } %>
+                                                                                              })<% if (withPersist) { %>
+                                                                                                ,
+                                                                                                {
+                                                                                                name: '<%=
+                                                                                                  kebabCase(name) %>
+                                                                                                  -storage'
+                                                                                                  }
+                                                                                                  )<% } %>)
+                                                                                                    <% } else { %>//
+                                                                                                      Redux Store
+                                                                                                      import {
+                                                                                                      createSlice,
+                                                                                                      createAsyncThunk<%
+                                                                                                        if (lang==='tsx'
+                                                                                                        ) { %>,
+                                                                                                        PayloadAction<%
+                                                                                                          } %> } from
+                                                                                                          '@reduxjs/toolkit'
+
+                                                                                                          <% if
+                                                                                                            (lang==='tsx'
+                                                                                                            && state &&
+                                                                                                            state.length>
+                                                                                                            0) { %>
+                                                                                                            interface
+                                                                                                            <%=
+                                                                                                              pascalCase(name)
+                                                                                                              %>State {
+                                                                                                              <%
+                                                                                                                state.forEach(s=>
+                                                                                                                { %>
+                                                                                                                <%=
+                                                                                                                  s.name
+                                                                                                                  %>:
+                                                                                                                  <%=
+                                                                                                                    s.type
+                                                                                                                    %>
+                                                                                                                    <% })
+                                                                                                                      %>
+                                                                                                                      loading:
+                                                                                                                      boolean
+                                                                                                                      error:
+                                                                                                                      string
+                                                                                                                      |
+                                                                                                                      null
+                                                                                                                      }
+                                                                                                                      <% }
+                                                                                                                        %>
+
+                                                                                                                        const
+                                                                                                                        initialState
+                                                                                                                        <% if
+                                                                                                                          (lang==='tsx'
+                                                                                                                          )
+                                                                                                                          {
+                                                                                                                          %>
+                                                                                                                          :
+                                                                                                                          <%=
+                                                                                                                            pascalCase(name)
+                                                                                                                            %>
+                                                                                                                            State
+                                                                                                                            <% }
+                                                                                                                              %>
+                                                                                                                              =
+                                                                                                                              {
+                                                                                                                              <% if
+                                                                                                                                (state
+                                                                                                                                &&
+                                                                                                                                state.length>
+                                                                                                                                0)
+                                                                                                                                {
+                                                                                                                                %>
+                                                                                                                                <%
+                                                                                                                                  state.forEach(s=>
+                                                                                                                                  {
+                                                                                                                                  %>
+                                                                                                                                  <%=
+                                                                                                                                    s.name
+                                                                                                                                    %>
+                                                                                                                                    :
+                                                                                                                                    <%=
+                                                                                                                                      s.default
+                                                                                                                                      !==undefined
+                                                                                                                                      ?
+                                                                                                                                      (typeof
+                                                                                                                                      s.default==='string'
+                                                                                                                                      ?
+                                                                                                                                      `'${s.default}'`
+                                                                                                                                      :
+                                                                                                                                      s.default)
+                                                                                                                                      : 'null'
+                                                                                                                                      %>
+                                                                                                                                      ,
+                                                                                                                                      <% })
+                                                                                                                                        %>
+                                                                                                                                        <% }
+                                                                                                                                          else
+                                                                                                                                          {
+                                                                                                                                          %>
+                                                                                                                                          data:
+                                                                                                                                          null,
+                                                                                                                                          <% }
+                                                                                                                                            %>
+                                                                                                                                            loading:
+                                                                                                                                            false,
+                                                                                                                                            error:
+                                                                                                                                            null
+                                                                                                                                            }
+
+                                                                                                                                            <% if
+                                                                                                                                              (actions
+                                                                                                                                              &&
+                                                                                                                                              actions.length>
+                                                                                                                                              0)
+                                                                                                                                              {
+                                                                                                                                              %>
+                                                                                                                                              <%
+                                                                                                                                                actions.forEach(action=>
+                                                                                                                                                {
+                                                                                                                                                %>
+                                                                                                                                                //
+                                                                                                                                                Async
+                                                                                                                                                Thunk:
+                                                                                                                                                <%=
+                                                                                                                                                  action
+                                                                                                                                                  %>
+                                                                                                                                                  export
+                                                                                                                                                  const
+                                                                                                                                                  <%=
+                                                                                                                                                    camelCase(action)
+                                                                                                                                                    %>
+                                                                                                                                                    =
+                                                                                                                                                    createAsyncThunk(
+                                                                                                                                                    '
+                                                                                                                                                    <%=
+                                                                                                                                                      kebabCase(name)
+                                                                                                                                                      %>
+                                                                                                                                                      /
+                                                                                                                                                      <%=
+                                                                                                                                                        kebabCase(action)
+                                                                                                                                                        %>
+                                                                                                                                                        ',
+                                                                                                                                                        async
+                                                                                                                                                        (_,
+                                                                                                                                                        {
+                                                                                                                                                        rejectWithValue
+                                                                                                                                                        })
+                                                                                                                                                        =>
+                                                                                                                                                        {
+                                                                                                                                                        try
+                                                                                                                                                        {
+                                                                                                                                                        //
+                                                                                                                                                        TODO:
+                                                                                                                                                        实现
+                                                                                                                                                        <%=
+                                                                                                                                                          action
+                                                                                                                                                          %>
+                                                                                                                                                          逻辑
+                                                                                                                                                          console.log('Executing
+                                                                                                                                                          <%=
+                                                                                                                                                            action
+                                                                                                                                                            %>
+                                                                                                                                                            ')
+                                                                                                                                                            return
+                                                                                                                                                            {
+                                                                                                                                                            success:
+                                                                                                                                                            true
+                                                                                                                                                            }
+                                                                                                                                                            }
+                                                                                                                                                            catch
+                                                                                                                                                            (error)
+                                                                                                                                                            {
+                                                                                                                                                            return
+                                                                                                                                                            rejectWithValue((error
+                                                                                                                                                            as
+                                                                                                                                                            Error).message)
+                                                                                                                                                            }
+                                                                                                                                                            }
+                                                                                                                                                            )
+
+                                                                                                                                                            <% })
+                                                                                                                                                              %>
+                                                                                                                                                              <% }
+                                                                                                                                                                else
+                                                                                                                                                                {
+                                                                                                                                                                %>
+                                                                                                                                                                //
+                                                                                                                                                                Async
+                                                                                                                                                                Thunk:
+                                                                                                                                                                fetchData
+                                                                                                                                                                export
+                                                                                                                                                                const
+                                                                                                                                                                fetchData
+                                                                                                                                                                =
+                                                                                                                                                                createAsyncThunk(
+                                                                                                                                                                '
+                                                                                                                                                                <%=
+                                                                                                                                                                  kebabCase(name)
+                                                                                                                                                                  %>
+                                                                                                                                                                  /fetchData',
+                                                                                                                                                                  async
+                                                                                                                                                                  (_,
+                                                                                                                                                                  {
+                                                                                                                                                                  rejectWithValue
+                                                                                                                                                                  })
+                                                                                                                                                                  =>
+                                                                                                                                                                  {
+                                                                                                                                                                  try
+                                                                                                                                                                  {
+                                                                                                                                                                  //
+                                                                                                                                                                  TODO:
+                                                                                                                                                                  实现数据获取逻辑
+                                                                                                                                                                  await
+                                                                                                                                                                  new
+                                                                                                                                                                  Promise(resolve
+                                                                                                                                                                  =>
+                                                                                                                                                                  setTimeout(resolve,
+                                                                                                                                                                  1000))
+                                                                                                                                                                  return
+                                                                                                                                                                  {
+                                                                                                                                                                  success:
+                                                                                                                                                                  true
+                                                                                                                                                                  }
+                                                                                                                                                                  }
+                                                                                                                                                                  catch
+                                                                                                                                                                  (error)
+                                                                                                                                                                  {
+                                                                                                                                                                  return
+                                                                                                                                                                  rejectWithValue((error
+                                                                                                                                                                  as
+                                                                                                                                                                  Error).message)
+                                                                                                                                                                  }
+                                                                                                                                                                  }
+                                                                                                                                                                  )
+                                                                                                                                                                  <% }
+                                                                                                                                                                    %>
+
+                                                                                                                                                                    /**
+                                                                                                                                                                    *
+                                                                                                                                                                    <%=
+                                                                                                                                                                      name
+                                                                                                                                                                      %>
+                                                                                                                                                                      Slice
+                                                                                                                                                                      <% if
+                                                                                                                                                                        (description)
+                                                                                                                                                                        {
+                                                                                                                                                                        %>
+                                                                                                                                                                        -
+                                                                                                                                                                        <%=
+                                                                                                                                                                          description
+                                                                                                                                                                          %>
+                                                                                                                                                                          <% }
+                                                                                                                                                                            %>
+                                                                                                                                                                            */
+                                                                                                                                                                            const
+                                                                                                                                                                            <%=
+                                                                                                                                                                              camelCase(name)
+                                                                                                                                                                              %>
+                                                                                                                                                                              Slice
+                                                                                                                                                                              =
+                                                                                                                                                                              createSlice({
+                                                                                                                                                                              name:
+                                                                                                                                                                              '
+                                                                                                                                                                              <%=
+                                                                                                                                                                                kebabCase(name)
+                                                                                                                                                                                %>
+                                                                                                                                                                                ',
+                                                                                                                                                                                initialState,
+                                                                                                                                                                                reducers:
+                                                                                                                                                                                {
+                                                                                                                                                                                reset:
+                                                                                                                                                                                (state)
+                                                                                                                                                                                =>
+                                                                                                                                                                                {
+                                                                                                                                                                                Object.assign(state,
+                                                                                                                                                                                initialState)
+                                                                                                                                                                                }
+                                                                                                                                                                                },
+                                                                                                                                                                                extraReducers:
+                                                                                                                                                                                (builder)
+                                                                                                                                                                                =>
+                                                                                                                                                                                {
+                                                                                                                                                                                <% if
+                                                                                                                                                                                  (actions
+                                                                                                                                                                                  &&
+                                                                                                                                                                                  actions.length>
+                                                                                                                                                                                  0)
+                                                                                                                                                                                  {
+                                                                                                                                                                                  %>
+                                                                                                                                                                                  <%
+                                                                                                                                                                                    actions.forEach(action=>
+                                                                                                                                                                                    {
+                                                                                                                                                                                    %>
+                                                                                                                                                                                    //
+                                                                                                                                                                                    <%=
+                                                                                                                                                                                      action
+                                                                                                                                                                                      %>
+                                                                                                                                                                                      builder
+                                                                                                                                                                                      .addCase(
+                                                                                                                                                                                      <%=
+                                                                                                                                                                                        camelCase(action)
+                                                                                                                                                                                        %>
+                                                                                                                                                                                        .pending,
+                                                                                                                                                                                        (state)
+                                                                                                                                                                                        =>
+                                                                                                                                                                                        {
+                                                                                                                                                                                        state.loading
+                                                                                                                                                                                        =
+                                                                                                                                                                                        true
+                                                                                                                                                                                        state.error
+                                                                                                                                                                                        =
+                                                                                                                                                                                        null
+                                                                                                                                                                                        })
+                                                                                                                                                                                        .addCase(
+                                                                                                                                                                                        <%=
+                                                                                                                                                                                          camelCase(action)
+                                                                                                                                                                                          %>
+                                                                                                                                                                                          .fulfilled,
+                                                                                                                                                                                          (state,
+                                                                                                                                                                                          action)
+                                                                                                                                                                                          =>
+                                                                                                                                                                                          {
+                                                                                                                                                                                          state.loading
+                                                                                                                                                                                          =
+                                                                                                                                                                                          false
+                                                                                                                                                                                          //
+                                                                                                                                                                                          TODO:
+                                                                                                                                                                                          更新状态
+                                                                                                                                                                                          })
+                                                                                                                                                                                          .addCase(
+                                                                                                                                                                                          <%=
+                                                                                                                                                                                            camelCase(action)
+                                                                                                                                                                                            %>
+                                                                                                                                                                                            .rejected,
+                                                                                                                                                                                            (state,
+                                                                                                                                                                                            action)
+                                                                                                                                                                                            =>
+                                                                                                                                                                                            {
+                                                                                                                                                                                            state.loading
+                                                                                                                                                                                            =
+                                                                                                                                                                                            false
+                                                                                                                                                                                            state.error
+                                                                                                                                                                                            =
+                                                                                                                                                                                            action.payload
+                                                                                                                                                                                            as
+                                                                                                                                                                                            string
+                                                                                                                                                                                            })
+                                                                                                                                                                                            <% })
+                                                                                                                                                                                              %>
+                                                                                                                                                                                              <% }
+                                                                                                                                                                                                else
+                                                                                                                                                                                                {
+                                                                                                                                                                                                %>
+                                                                                                                                                                                                //
+                                                                                                                                                                                                fetchData
+                                                                                                                                                                                                builder
+                                                                                                                                                                                                .addCase(fetchData.pending,
+                                                                                                                                                                                                (state)
+                                                                                                                                                                                                =>
+                                                                                                                                                                                                {
+                                                                                                                                                                                                state.loading
+                                                                                                                                                                                                =
+                                                                                                                                                                                                true
+                                                                                                                                                                                                state.error
+                                                                                                                                                                                                =
+                                                                                                                                                                                                null
+                                                                                                                                                                                                })
+                                                                                                                                                                                                .addCase(fetchData.fulfilled,
+                                                                                                                                                                                                (state,
+                                                                                                                                                                                                action)
+                                                                                                                                                                                                =>
+                                                                                                                                                                                                {
+                                                                                                                                                                                                state.loading
+                                                                                                                                                                                                =
+                                                                                                                                                                                                false
+                                                                                                                                                                                                state.data
+                                                                                                                                                                                                =
+                                                                                                                                                                                                action.payload
+                                                                                                                                                                                                })
+                                                                                                                                                                                                .addCase(fetchData.rejected,
+                                                                                                                                                                                                (state,
+                                                                                                                                                                                                action)
+                                                                                                                                                                                                =>
+                                                                                                                                                                                                {
+                                                                                                                                                                                                state.loading
+                                                                                                                                                                                                =
+                                                                                                                                                                                                false
+                                                                                                                                                                                                state.error
+                                                                                                                                                                                                =
+                                                                                                                                                                                                action.payload
+                                                                                                                                                                                                as
+                                                                                                                                                                                                string
+                                                                                                                                                                                                })
+                                                                                                                                                                                                <% }
+                                                                                                                                                                                                  %>
+                                                                                                                                                                                                  }
+                                                                                                                                                                                                  })
+
+                                                                                                                                                                                                  export
+                                                                                                                                                                                                  const
+                                                                                                                                                                                                  {
+                                                                                                                                                                                                  reset
+                                                                                                                                                                                                  }
+                                                                                                                                                                                                  =
+                                                                                                                                                                                                  <%=
+                                                                                                                                                                                                    camelCase(name)
+                                                                                                                                                                                                    %>
+                                                                                                                                                                                                    Slice.actions
+                                                                                                                                                                                                    export
+                                                                                                                                                                                                    default
+                                                                                                                                                                                                    <%=
+                                                                                                                                                                                                      camelCase(name)
+                                                                                                                                                                                                      %>
+                                                                                                                                                                                                      Slice.reducer
+                                                                                                                                                                                                      <% }
+                                                                                                                                                                                                        %>

@@ -1,0 +1,73 @@
+/**
+* <%= name %> 类型定义<% if (description) { %> - <%= description %>
+      <% } %>
+        * @module <%= name %>
+          */
+
+          /**
+          * 基础类型
+          */
+          export interface <%= pascalCase(name) %> {
+            id: string
+            // TODO: 添加具体字段
+            [key: string]: any
+            }
+
+            /**
+            * 创建参数
+            */
+            export type Create<%= pascalCase(name) %>Input = Omit<<%= pascalCase(name) %>, 'id'>
+
+                /**
+                * 更新参数
+                */
+                export type Update<%= pascalCase(name) %>Input = Partial<Create<%= pascalCase(name) %>Input>
+
+                    /**
+                    * 查询参数
+                    */
+                    export interface <%= pascalCase(name) %>QueryParams {
+                      page?: number
+                      pageSize?: number
+                      sortBy?: string
+                      sortOrder?: 'asc' | 'desc'
+                      // TODO: 添加其他查询参数
+                      }
+
+                      /**
+                      * 列表响应
+                      */
+                      export interface <%= pascalCase(name) %>ListResponse {
+                        data: <%= pascalCase(name) %>[]
+                          total: number
+                          page: number
+                          pageSize: number
+                          }
+
+                          /**
+                          * 详情响应
+                          */
+                          export interface <%= pascalCase(name) %>DetailResponse {
+                            data: <%= pascalCase(name) %>
+                              }
+
+                              /**
+                              * 状态枚举
+                              */
+                              export enum <%= pascalCase(name) %>Status {
+                                Active = 'active',
+                                Inactive = 'inactive',
+                                Pending = 'pending'
+                                }
+
+                                /**
+                                * 错误类型
+                                */
+                                export interface <%= pascalCase(name) %>Error {
+                                  code: string
+                                  message: string
+                                  details?: any
+                                  }
+
+                                  // 导出所有类型
+                                  export type * from './<%= kebabCase(name) %>'

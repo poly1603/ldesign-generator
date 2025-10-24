@@ -1,0 +1,153 @@
+/**
+* <%= pascalCase(name) %> 模型<% if (description) { %> - <%= description %>
+      <% } %>
+        */
+
+        /**
+        * 基础接口
+        */
+        export interface <%= pascalCase(name) %> {
+          id: string
+          <% if (fields && fields.length> 0) { %>
+            <% fields.forEach(field=> { %>
+              <%= field.name %>
+                <%= field.required===false ? '?' : '' %>: <%= field.type %>
+                    <% if (field.description) { %> // <%= field.description %>
+                        <% } %>
+                          <% }) %>
+                            <% } else { %>
+                              // TODO: 添加字段定义
+                              name: string
+                              description?: string
+                              <% } %>
+                                createdAt?: Date
+                                updatedAt?: Date
+                                }
+
+                                /**
+                                * 创建参数
+                                */
+                                export type Create<%= pascalCase(name) %>Dto = Omit<<%= pascalCase(name) %>, 'id' |
+                                    'createdAt' | 'updatedAt'>
+
+                                    /**
+                                    * 更新参数
+                                    */
+                                    export type Update<%= pascalCase(name) %>Dto = Partial<Create<%= pascalCase(name) %>
+                                        Dto>
+
+                                        /**
+                                        * 查询参数
+                                        */
+                                        export interface <%= pascalCase(name) %>QueryParams {
+                                          page?: number
+                                          pageSize?: number
+                                          sortBy?: string
+                                          sortOrder?: 'asc' | 'desc'
+                                          search?: string
+                                          filters?: Record<string, any>
+                                            }
+
+                                            /**
+                                            * 列表响应
+                                            */
+                                            export interface <%= pascalCase(name) %>ListResponse {
+                                              data: <%= pascalCase(name) %>[]
+                                                total: number
+                                                page: number
+                                                pageSize: number
+                                                }
+
+                                                /**
+                                                * 状态枚举
+                                                */
+                                                export enum <%= pascalCase(name) %>Status {
+                                                  Active = 'active',
+                                                  Inactive = 'inactive',
+                                                  Pending = 'pending',
+                                                  Deleted = 'deleted'
+                                                  }
+
+                                                  /**
+                                                  * <%= pascalCase(name) %> 类
+                                                    */
+                                                    export class <%= pascalCase(name) %>Model implements <%=
+                                                        pascalCase(name) %> {
+                                                        id!: string
+                                                        <% if (fields && fields.length> 0) { %>
+                                                          <% fields.forEach(field=> { %>
+                                                            <%= field.name %>
+                                                              <%= field.required===false ? '?' : '!' %>: <%= field.type
+                                                                  %>
+                                                                  <% }) %>
+                                                                    <% } else { %>
+                                                                      name!: string
+                                                                      description?: string
+                                                                      <% } %>
+                                                                        createdAt?: Date
+                                                                        updatedAt?: Date
+
+                                                                        constructor(data?: Partial<<%= pascalCase(name)
+                                                                          %>>) {
+                                                                          if (data) {
+                                                                          Object.assign(this, data)
+                                                                          }
+                                                                          }
+
+                                                                          /**
+                                                                          * 验证数据
+                                                                          */
+                                                                          validate(): boolean {
+                                                                          // TODO: 实现验证逻辑
+                                                                          if (!this.id) {
+                                                                          return false
+                                                                          }
+
+                                                                          <% if (fields && fields.length> 0) { %>
+                                                                            <% fields.filter(f=> f.required !==
+                                                                              false).forEach(field => { %>
+                                                                              if (!this.<%= field.name %>) {
+                                                                                return false
+                                                                                }
+                                                                                <% }) %>
+                                                                                  <% } %>
+
+                                                                                    return true
+                                                                                    }
+
+                                                                                    /**
+                                                                                    * 转换为 JSON
+                                                                                    */
+                                                                                    toJSON(): <%= pascalCase(name) %> {
+                                                                                      return {
+                                                                                      id: this.id,
+                                                                                      <% if (fields && fields.length> 0)
+                                                                                        { %>
+                                                                                        <% fields.forEach(field=> { %>
+                                                                                          <%= field.name %>: this.<%=
+                                                                                              field.name %>,
+                                                                                              <% }) %>
+                                                                                                <% } else { %>
+                                                                                                  name: this.name,
+                                                                                                  description:
+                                                                                                  this.description,
+                                                                                                  <% } %>
+                                                                                                    createdAt:
+                                                                                                    this.createdAt,
+                                                                                                    updatedAt:
+                                                                                                    this.updatedAt
+                                                                                                    }
+                                                                                                    }
+
+                                                                                                    /**
+                                                                                                    * 从 JSON 创建实例
+                                                                                                    */
+                                                                                                    static
+                                                                                                    fromJSON(json: any):
+                                                                                                    <%= pascalCase(name)
+                                                                                                      %>Model {
+                                                                                                      return new <%=
+                                                                                                        pascalCase(name)
+                                                                                                        %>Model(json)
+                                                                                                        }
+                                                                                                        }

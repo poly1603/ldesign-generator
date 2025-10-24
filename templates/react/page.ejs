@@ -1,0 +1,338 @@
+import React, { useState, useEffect } from 'react'
+<% if (route) { %>import { useNavigate<% if (crudType==='detail' || crudType==='edit' ) { %>, useParams<% } %> } from
+      'react-router-dom'<% } %>
+        <% if (withApi) { %>import * as <%= camelCase(pageName) %>Api from '@/api/<%= kebabCase(pageName) %>'<% } %>
+                <% if (withStyle !==false && styleType) { %>import './<%=kebabCase(pageName)%>.<%= styleType %>'<% } %>
+
+                        <% if (lang==='tsx' && crudType==='list' ) { %>
+                          interface <%= pascalCase(pageName) %>Item {
+                            id: string
+                            // TODO: 定义数据项类型
+                            [key: string]: any
+                            }
+                            <% } %>
+
+                              /**
+                              * <%= pageName %> Page<% if (description) { %> - <%= description %>
+                                    <% } %>
+                                      */
+                                      export const <%= pascalCase(pageName) %>Page<% if (lang==='tsx' ) { %>: React.FC<%
+                                            } %> = () => {
+                                            <% if (route) { %>
+                                              const navigate = useNavigate()
+                                              <% if (crudType==='detail' || crudType==='edit' ) { %>
+                                                const { id } = useParams<% if (lang==='tsx' ) { %>
+                                                  <{ id: string }>()<% } else { %>()<% } %>
+                                                        <% } %>
+                                                          <% } %>
+
+                                                            const [loading, setLoading] = useState(false)
+                                                            <% if (crudType==='list' ) { %>
+                                                              const [dataList, setDataList] = useState<% if
+                                                                (lang==='tsx' ) { %>
+                                                                <<%= pascalCase(pageName) %>Item[]><% } %>([])<% } else
+                                                                      if (crudType==='detail' ) { %>
+                                                                      const [detail, setDetail] = useState<% if
+                                                                        (lang==='tsx' ) { %>
+                                                                        <any>
+                                                                          <% } %>(null)<% } else if (crudType==='edit'
+                                                                              || crudType==='create' ) { %>
+                                                                              const [formData, setFormData] = useState<%
+                                                                                if (lang==='tsx' ) { %>
+                                                                                <any>
+                                                                                  <% } %>({
+                                                                                    // TODO: 初始化表单数据
+                                                                                    })<% } %>
+                                                                                      <% if (crudType==='list' ) { %>
+                                                                                        const [pagination,
+                                                                                        setPagination] = useState({
+                                                                                        current: 1,
+                                                                                        pageSize: 10,
+                                                                                        total: 0
+                                                                                        })
+                                                                                        <% } %>
+
+                                                                                          useEffect(() => {
+                                                                                          fetchData()
+                                                                                          }, [])
+
+                                                                                          const fetchData = async () =>
+                                                                                          {
+                                                                                          setLoading(true)
+                                                                                          try {
+                                                                                          <% if (withApi) { %>
+                                                                                            <% if (crudType==='list' ) {
+                                                                                              %>
+                                                                                              const res = await <%=
+                                                                                                camelCase(pageName) %>
+                                                                                                Api.getList(pagination)
+                                                                                                setDataList(res.data)
+                                                                                                setPagination(prev => ({
+                                                                                                ...prev, total:
+                                                                                                res.total }))
+                                                                                                <% } else if
+                                                                                                  (crudType==='detail' )
+                                                                                                  { %>
+                                                                                                  const data = await <%=
+                                                                                                    camelCase(pageName)
+                                                                                                    %>Api.getDetail(id!)
+                                                                                                    setDetail(data)
+                                                                                                    <% } %>
+                                                                                                      <% } else { %>
+                                                                                                        // TODO:
+                                                                                                        实现数据获取逻辑
+                                                                                                        <% } %>
+                                                                                                          } catch
+                                                                                                          (error) {
+                                                                                                          console.error('获取数据失败:',
+                                                                                                          error)
+                                                                                                          } finally {
+                                                                                                          setLoading(false)
+                                                                                                          }
+                                                                                                          }
+
+                                                                                                          <% if
+                                                                                                            (crudType==='edit'
+                                                                                                            ||
+                                                                                                            crudType==='create'
+                                                                                                            ) { %>
+                                                                                                            const
+                                                                                                            handleSubmit
+                                                                                                            = async (e<%
+                                                                                                              if
+                                                                                                              (lang==='tsx'
+                                                                                                              ) { %>:
+                                                                                                              React.FormEvent
+                                                                                                              <% } %>)
+                                                                                                                => {
+                                                                                                                e.preventDefault()
+                                                                                                                setLoading(true)
+                                                                                                                try {
+                                                                                                                <% if
+                                                                                                                  (withApi)
+                                                                                                                  { %>
+                                                                                                                  <% if
+                                                                                                                    (crudType==='create'
+                                                                                                                    ) {
+                                                                                                                    %>
+                                                                                                                    await
+                                                                                                                    <%=
+                                                                                                                      camelCase(pageName)
+                                                                                                                      %>
+                                                                                                                      Api.create(formData)
+                                                                                                                      <% }
+                                                                                                                        else
+                                                                                                                        {
+                                                                                                                        %>
+                                                                                                                        await
+                                                                                                                        <%=
+                                                                                                                          camelCase(pageName)
+                                                                                                                          %>
+                                                                                                                          Api.update(id!,
+                                                                                                                          formData)
+                                                                                                                          <% }
+                                                                                                                            %>
+                                                                                                                            <% if
+                                                                                                                              (route)
+                                                                                                                              {
+                                                                                                                              %>
+                                                                                                                              navigate('/
+                                                                                                                              <%=
+                                                                                                                                kebabCase(pageName)
+                                                                                                                                %>
+                                                                                                                                ')
+                                                                                                                                <% }
+                                                                                                                                  %>
+                                                                                                                                  <% }
+                                                                                                                                    else
+                                                                                                                                    {
+                                                                                                                                    %>
+                                                                                                                                    //
+                                                                                                                                    TODO:
+                                                                                                                                    实现提交逻辑
+                                                                                                                                    <% }
+                                                                                                                                      %>
+                                                                                                                                      }
+                                                                                                                                      catch
+                                                                                                                                      (error)
+                                                                                                                                      {
+                                                                                                                                      console.error('提交失败:',
+                                                                                                                                      error)
+                                                                                                                                      }
+                                                                                                                                      finally
+                                                                                                                                      {
+                                                                                                                                      setLoading(false)
+                                                                                                                                      }
+                                                                                                                                      }
+
+                                                                                                                                      const
+                                                                                                                                      handleChange
+                                                                                                                                      =
+                                                                                                                                      (field
+                                                                                                                                      <% if
+                                                                                                                                        (lang==='tsx'
+                                                                                                                                        )
+                                                                                                                                        {
+                                                                                                                                        %>
+                                                                                                                                        :
+                                                                                                                                        string
+                                                                                                                                        <% }
+                                                                                                                                          %>
+                                                                                                                                          ,
+                                                                                                                                          value
+                                                                                                                                          <% if
+                                                                                                                                            (lang==='tsx'
+                                                                                                                                            )
+                                                                                                                                            {
+                                                                                                                                            %>
+                                                                                                                                            :
+                                                                                                                                            any
+                                                                                                                                            <% }
+                                                                                                                                              %>
+                                                                                                                                              )
+                                                                                                                                              =>
+                                                                                                                                              {
+                                                                                                                                              setFormData((prev
+                                                                                                                                              <% if
+                                                                                                                                                (lang==='tsx'
+                                                                                                                                                )
+                                                                                                                                                {
+                                                                                                                                                %>
+                                                                                                                                                :
+                                                                                                                                                any
+                                                                                                                                                <% }
+                                                                                                                                                  %>
+                                                                                                                                                  )
+                                                                                                                                                  =>
+                                                                                                                                                  ({
+                                                                                                                                                  ...prev,
+                                                                                                                                                  [field]:
+                                                                                                                                                  value
+                                                                                                                                                  }))
+                                                                                                                                                  }
+                                                                                                                                                  <% }
+                                                                                                                                                    %>
+
+                                                                                                                                                    if
+                                                                                                                                                    (loading)
+                                                                                                                                                    {
+                                                                                                                                                    return
+                                                                                                                                                    <div
+                                                                                                                                                      className="loading">
+                                                                                                                                                      Loading...
+                                                                                                                                                    </div>
+                                                                                                                                                    }
+
+                                                                                                                                                    return
+                                                                                                                                                    (
+                                                                                                                                                    <div
+                                                                                                                                                      className="<%= kebabCase(pageName) %>-page">
+                                                                                                                                                      <div
+                                                                                                                                                        className="page-header">
+                                                                                                                                                        <h1>
+                                                                                                                                                          <%=
+                                                                                                                                                            pageName
+                                                                                                                                                            %>
+                                                                                                                                                        </h1>
+                                                                                                                                                      </div>
+
+                                                                                                                                                      <div
+                                                                                                                                                        className="page-content">
+                                                                                                                                                        <% if
+                                                                                                                                                          (crudType==='list'
+                                                                                                                                                          )
+                                                                                                                                                          {
+                                                                                                                                                          %>
+                                                                                                                                                          {/*
+                                                                                                                                                          列表视图
+                                                                                                                                                          */}
+                                                                                                                                                          <div
+                                                                                                                                                            className="table-container">
+                                                                                                                                                            {/*
+                                                                                                                                                            TODO:
+                                                                                                                                                            添加表格组件
+                                                                                                                                                            */}
+                                                                                                                                                            <ul>
+                                                                                                                                                              {dataList.map(item
+                                                                                                                                                              =>
+                                                                                                                                                              (
+                                                                                                                                                              <li
+                                                                                                                                                                key={item.id}>
+                                                                                                                                                                {JSON.stringify(item)}
+                                                                                                                                                              </li>
+                                                                                                                                                              ))}
+                                                                                                                                                            </ul>
+                                                                                                                                                          </div>
+                                                                                                                                                          <% }
+                                                                                                                                                            else
+                                                                                                                                                            if
+                                                                                                                                                            (crudType==='detail'
+                                                                                                                                                            )
+                                                                                                                                                            {
+                                                                                                                                                            %>
+                                                                                                                                                            {/*
+                                                                                                                                                            详情视图
+                                                                                                                                                            */}
+                                                                                                                                                            <div
+                                                                                                                                                              className="detail-container">
+                                                                                                                                                              {detail
+                                                                                                                                                              &&
+                                                                                                                                                              (
+                                                                                                                                                              <pre>{JSON.stringify(detail, null, 2)}</pre>
+                                                                                                                                                              )}
+                                                                                                                                                            </div>
+                                                                                                                                                            <% }
+                                                                                                                                                              else
+                                                                                                                                                              if
+                                                                                                                                                              (crudType==='edit'
+                                                                                                                                                              ||
+                                                                                                                                                              crudType==='create'
+                                                                                                                                                              )
+                                                                                                                                                              {
+                                                                                                                                                              %>
+                                                                                                                                                              {/*
+                                                                                                                                                              表单视图
+                                                                                                                                                              */}
+                                                                                                                                                              <form
+                                                                                                                                                                className="form-container"
+                                                                                                                                                                onSubmit={handleSubmit}>
+                                                                                                                                                                {/*
+                                                                                                                                                                TODO:
+                                                                                                                                                                添加表单字段
+                                                                                                                                                                */}
+                                                                                                                                                                <button
+                                                                                                                                                                  type="submit"
+                                                                                                                                                                  disabled={loading}>
+                                                                                                                                                                  {loading
+                                                                                                                                                                  ?
+                                                                                                                                                                  'Submitting...'
+                                                                                                                                                                  :
+                                                                                                                                                                  'Submit'}
+                                                                                                                                                                </button>
+                                                                                                                                                              </form>
+                                                                                                                                                              <% }
+                                                                                                                                                                else
+                                                                                                                                                                {
+                                                                                                                                                                %>
+                                                                                                                                                                {/*
+                                                                                                                                                                自定义内容
+                                                                                                                                                                */}
+                                                                                                                                                                <p>
+                                                                                                                                                                  Page
+                                                                                                                                                                  content
+                                                                                                                                                                  goes
+                                                                                                                                                                  here
+                                                                                                                                                                </p>
+                                                                                                                                                                <% }
+                                                                                                                                                                  %>
+                                                                                                                                                      </div>
+                                                                                                                                                    </div>
+                                                                                                                                                    )
+                                                                                                                                                    }
+
+                                                                                                                                                    export
+                                                                                                                                                    default
+                                                                                                                                                    <%=
+                                                                                                                                                      pascalCase(pageName)
+                                                                                                                                                      %>
+                                                                                                                                                      Page

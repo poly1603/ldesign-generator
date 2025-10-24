@@ -1,0 +1,145 @@
+<template>
+  <div class="<%= kebabCase(pageName) %>-page">
+    <% if (description) { %><!-- <%= description %> -->
+      <% } %>
+        <div class="page-header">
+          <h1>
+            <%= pageName %>
+          </h1>
+        </div>
+
+        <div class="page-content">
+          <% if (crudType==='list' ) { %>
+            <!-- 列表视图 -->
+            <div class="table-container">
+              <!-- TODO: 添加表格组件 -->
+            </div>
+            <% } else if (crudType==='detail' ) { %>
+              <!-- 详情视图 -->
+              <div class="detail-container">
+                <!-- TODO: 添加详情内容 -->
+              </div>
+              <% } else if (crudType==='edit' || crudType==='create' ) { %>
+                <!-- 表单视图 -->
+                <div class="form-container">
+                  <!-- TODO: 添加表单组件 -->
+                </div>
+                <% } else { %>
+                  <!-- 自定义内容 -->
+                  <p>Page content goes here</p>
+                  <% } %>
+        </div>
+  </div>
+</template>
+
+<script <% if (lang==='ts' ) { %>lang = "ts" <% } %> setup >
+<% if (withStore) { %>import { use<%= pascalCase(pageName) %> Store } from '@/stores/<%= kebabCase(pageName) %>' <% } %>
+<% if (withApi) { %>import * as <%= camelCase(pageName) %> Api from '@/api/<%= kebabCase(pageName) %>' <% } %>
+import { ref, onMounted } from 'vue'
+<% if (route) { %>import { useRoute, useRouter } from 'vue-router'<% } %>
+
+<% if (route) { %>
+const route = useRoute()
+    const router = useRouter()
+      <% } %>
+<% if (withStore) { %>
+const store = use <%= pascalCase(pageName) %> Store()
+      <% } %>
+
+// 页面状态
+const loading = ref(false)
+    <% if (crudType === 'list') { %>
+const dataList = ref < any[] > ([])
+      const pagination = ref({
+        current: 1,
+        pageSize: 10,
+        total: 0
+      })
+        <% } else if (crudType === 'detail') { %>
+const detail = ref < any > ({})
+            <% } else if (crudType === 'edit' || crudType === 'create') { %>
+const formData = ref < any > ({})
+                <% } %>
+
+                  // 初始化
+                  onMounted(async () => {
+                    await fetchData()
+                  })
+
+  // 获取数据
+  const fetchData = async () => {
+    loading.value = true
+    try {
+    <% if (withApi) { %>
+    <% if (crudType === 'list') { %>
+    const res = await <%= camelCase(pageName) %> Api.getList(pagination.value)
+          dataList.value = res.data
+          pagination.value.total = res.total
+            <% } else if (crudType === 'detail') { %>
+    const id = route.params.id as string
+              detail.value = await <%= camelCase(pageName) %> Api.getDetail(id)
+                <% } %>
+    <% } else { %>
+    // TODO: 实现数据获取逻辑
+    <% } %>
+  } catch (error) {
+      console.error('获取数据失败:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+<% if (crudType === 'edit' || crudType === 'create') { %>
+// 提交表单
+const handleSubmit = async () => {
+      loading.value = true
+      try {
+    <% if (withApi) { %>
+    <% if (crudType === 'create') { %>
+            await <%= camelCase(pageName) %> Api.create(formData.value)
+              <% } else { %>
+    const id = route.params.id as string
+            await <%= camelCase(pageName) %> Api.update(id, formData.value)
+              <% } %>
+                router.push({ name: '<%= kebabCase(pageName) %>-list' })
+                <% } else { %>
+    // TODO: 实现提交逻辑
+    <% } %>
+  } catch (error) {
+        console.error('提交失败:', error)
+      } finally {
+        loading.value = false
+      }
+    }
+<% } %>
+</script>
+
+<% if (withStyle !==false) { %>
+  <style <% if (styleType==='scss' ) { %>
+    lang="scss" <%
+    }
+
+    else if (styleType==='less') {
+      %>lang="less" <%
+    }
+
+    %>scoped>.<%=kebabCase(pageName) %>-page {
+      padding: 20px;
+
+      .page-header {
+        margin-bottom: 20px;
+
+        h1 {
+          font-size: 24px;
+          font-weight: 600;
+        }
+      }
+
+      .page-content {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+      }
+    }
+  </style>
+  <% } %>

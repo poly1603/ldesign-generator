@@ -1,0 +1,129 @@
+import { describe, it, expect<% if (testFramework==='vitest' ) { %>, vi<% } else if (testFramework==='jest' ) { %>, jest
+    <% } %>, beforeEach, afterEach } from '<%= testFramework==='vitest' ? 'vitest' : testFramework==='jest'
+        ? '@jest/globals' : 'test' %>'
+        <% if (type==='component' && framework==='vue' ) { %>import { mount } from '@vue/test-utils'
+          import <%= pascalCase(name) %> from './<%= name %>'
+              <% } else if (type==='component' && framework==='react' ) { %>import { render, screen, fireEvent } from
+                '@testing-library/react'
+                import <%= pascalCase(name) %> from './<%= name %>'
+                    <% } else { %>import { <%= camelCase(name) %> } from './<%= name %>'
+                          <% } %>
+
+                            describe('<%= name %>', () => {
+                              <% if (type==='component' ) { %>
+                                <% if (framework==='vue' ) { %>
+                                  it('should render correctly', () => {
+                                  const wrapper = mount(<%= pascalCase(name) %>, {
+                                    props: {
+                                    // TODO: 添加 props
+                                    }
+                                    })
+
+                                    expect(wrapper.exists()).toBe(true)
+                                    // TODO: 添加更多断言
+                                    })
+
+                                    it('should emit events', async () => {
+                                    const wrapper = mount(<%= pascalCase(name) %>)
+
+                                      // TODO: 触发事件
+                                      // await wrapper.find('button').trigger('click')
+                                      // expect(wrapper.emitted()).toHaveProperty('click')
+                                      })
+
+                                      it('should update when props change', async () => {
+                                      const wrapper = mount(<%= pascalCase(name) %>, {
+                                        props: {
+                                        // TODO: 初始 props
+                                        }
+                                        })
+
+                                        await wrapper.setProps({
+                                        // TODO: 更新 props
+                                        })
+
+                                        // TODO: 验证更新
+                                        })
+                                        <% } else if (framework==='react' ) { %>
+                                          it('should render correctly', () => {
+                                          render(<<%= pascalCase(name) %> />)
+
+                                            // TODO: 添加断言
+                                            // expect(screen.getByText('text')).toBeInTheDocument()
+                                            })
+
+                                            it('should handle user interactions', () => {
+                                            render(<<%= pascalCase(name) %> />)
+
+                                              // TODO: 模拟用户交互
+                                              // fireEvent.click(screen.getByRole('button'))
+                                              // expect(mockFunction).toHaveBeenCalled()
+                                              })
+
+                                              it('should update when props change', () => {
+                                              const { rerender } = render(<<%= pascalCase(name) %> prop="initial" />)
+
+                                                rerender(<<%= pascalCase(name) %> prop="updated" />)
+
+                                                  // TODO: 验证更新
+                                                  })
+                                                  <% } %>
+                                                    <% } else if (type==='hook' ) { %>
+                                                      it('should return initial state', () => {
+                                                      const result = <%= camelCase(name) %>()
+
+                                                        expect(result).toBeDefined()
+                                                        // TODO: 验证初始状态
+                                                        })
+
+                                                        it('should execute successfully', async () => {
+                                                        const result = <%= camelCase(name) %>()
+
+                                                          await result.execute()
+
+                                                          // TODO: 验证执行结果
+                                                          })
+
+                                                          it('should handle errors', async () => {
+                                                          const result = <%= camelCase(name) %>()
+
+                                                            // TODO: 模拟错误
+                                                            // expect(result.error).toBeDefined()
+                                                            })
+                                                            <% } else if (type==='api' ) { %>
+                                                              beforeEach(() => {
+                                                              // TODO: 设置 mock
+                                                              <% if (testFramework==='vitest' ) { %>vi<% } else { %>jest
+                                                                  <% } %>.clearAllMocks()
+                                                                    })
+
+                                                                    it('should fetch data successfully', async () => {
+                                                                    // TODO: mock 响应
+                                                                    const result = await <%= camelCase(name) %>()
+
+                                                                      expect(result).toBeDefined()
+                                                                      })
+
+                                                                      it('should handle API errors', async () => {
+                                                                      // TODO: mock 错误响应
+                                                                      await expect(<%= camelCase(name) %>
+                                                                        ()).rejects.toThrow()
+                                                                        })
+                                                                        <% } else { %>
+                                                                          it('should work correctly', () => {
+                                                                          const result = <%= camelCase(name) %>()
+
+                                                                            expect(result).toBeDefined()
+                                                                            // TODO: 添加具体断言
+                                                                            })
+
+                                                                            it('should handle edge cases', () => {
+                                                                            // TODO: 测试边界情况
+                                                                            })
+
+                                                                            it('should handle errors gracefully', () =>
+                                                                            {
+                                                                            // TODO: 测试错误处理
+                                                                            })
+                                                                            <% } %>
+                                                                              })

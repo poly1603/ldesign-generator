@@ -1,0 +1,88 @@
+import { ref<% if (async) { %>, computed<% } %> } from 'vue'
+
+    <% if (params && params.length> 0 && lang === 'ts') { %>
+      interface <%= pascalCase(name) %>Params {
+        <% params.forEach(param=> { %>
+          <%= param.name %>: <%= param.type %>
+              <% }) %>
+                }
+                <% } %>
+
+                  <% if (returns && lang==='ts' ) { %>
+                    interface <%= pascalCase(name) %>Return {
+                      <%= returns %>
+                        }
+                        <% } %>
+
+                          /**
+                          * <%= name %>
+                            <% if (description) { %> - <%= description %>
+                                <% } %>
+                                  <% if (params && params.length> 0) { %>* @param {<%= params.map(p=> p.type).join(', ')
+                                      %>} params - 参数对象<% } %>
+                                        * @returns {<%= returns || 'object' %>} 返回对象
+                                          */
+                                          export function <%= camelCase(name) %>(<% if (params && params.length> 0) {
+                                              %>params<% if (lang==='ts' ) { %>: <%= pascalCase(name) %>Params<% } %>
+                                                    <% } %>)<% if (lang==='ts' && returns) { %>: <%= pascalCase(name) %>
+                                                          Return<% } %> {
+                                                            // 响应式状态
+                                                            const loading = ref(false)
+                                                            const error = ref<Error | null>(null)
+                                                              const data = ref<any>(null)
+
+                                                                <% if (async) { %>
+                                                                  // 异步方法
+                                                                  const execute = async () => {
+                                                                  loading.value = true
+                                                                  error.value = null
+
+                                                                  try {
+                                                                  // TODO: 实现异步逻辑
+                                                                  <% if (params && params.length> 0) { %>
+                                                                    console.log('Parameters:', params)
+                                                                    <% } %>
+
+                                                                      // 模拟异步请求
+                                                                      await new Promise(resolve => setTimeout(resolve,
+                                                                      1000))
+
+                                                                      data.value = { success: true }
+                                                                      return data.value
+                                                                      } catch (e) {
+                                                                      error.value = e as Error
+                                                                      throw e
+                                                                      } finally {
+                                                                      loading.value = false
+                                                                      }
+                                                                      }
+
+                                                                      // 计算属性
+                                                                      const isReady = computed(() => !loading.value &&
+                                                                      !error.value)
+                                                                      <% } else { %>
+                                                                        // 同步方法
+                                                                        const execute = () => {
+                                                                        // TODO: 实现逻辑
+                                                                        <% if (params && params.length> 0) { %>
+                                                                          console.log('Parameters:', params)
+                                                                          <% } %>
+                                                                            }
+                                                                            <% } %>
+
+                                                                              // 重置状态
+                                                                              const reset = () => {
+                                                                              loading.value = false
+                                                                              error.value = null
+                                                                              data.value = null
+                                                                              }
+
+                                                                              return {
+                                                                              loading,
+                                                                              error,
+                                                                              data,
+                                                                              <% if (async) { %>isReady,<% } %>
+                                                                                  execute,
+                                                                                  reset
+                                                                                  }
+                                                                                  }

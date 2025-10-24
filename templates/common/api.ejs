@@ -1,0 +1,603 @@
+<% if (withTypes && lang==='ts' ) { %>/**
+  * <%= name %> API 类型定义<% if (description) { %> - <%= description %>
+        <% } %>
+          */
+          <% if (endpoints && endpoints.length> 0) { %>
+            <% endpoints.forEach(endpoint=> { %>
+              <% if (endpoint.params && endpoint.params.length> 0) { %>
+                export interface <%= pascalCase(endpoint.name) %>Params {
+                  <% endpoint.params.forEach(param=> { %>
+                    <%= param %>: any // TODO: 定义具体类型
+                      <% }) %>
+                        }
+                        <% } %>
+
+                          <% if (endpoint.body) { %>
+                            export interface <%= pascalCase(endpoint.name) %>Body {
+                              <%= endpoint.body %> // TODO: 定义具体类型
+                                }
+                                <% } %>
+
+                                  <% if (endpoint.response) { %>
+                                    export interface <%= pascalCase(endpoint.name) %>Response {
+                                      <%= endpoint.response %> // TODO: 定义具体类型
+                                        }
+                                        <% } %>
+
+                                          <% }) %>
+                                            <% } %>
+
+                                              <% } %>
+                                                import axios, { AxiosInstance<% if (withTypes && lang==='ts' ) { %>,
+                                                  AxiosRequestConfig<% } %> } from 'axios'
+
+                                                    /**
+                                                    * <%= name %> API 服务<% if (description) { %> - <%= description %>
+                                                          <% } %>
+                                                            */
+                                                            class <%= pascalCase(name) %>Api {
+                                                              private instance: AxiosInstance
+
+                                                              constructor(baseURL<% if (lang==='ts' ) { %>?: string<% }
+                                                                  %>) {
+                                                                  this.instance = axios.create({
+                                                                  baseURL: baseURL || '<%= baseUrl || '/api' %>',
+                                                                    timeout: 10000,
+                                                                    headers: {
+                                                                    'Content-Type': 'application/json'
+                                                                    }
+                                                                    })
+
+                                                                    this.setupInterceptors()
+                                                                    }
+
+                                                                    /**
+                                                                    * 设置拦截器
+                                                                    */
+                                                                    private setupInterceptors() {
+                                                                    // 请求拦截器
+                                                                    this.instance.interceptors.request.use(
+                                                                    (config) => {
+                                                                    // TODO: 添加 token 等请求头
+                                                                    // const token = localStorage.getItem('token')
+                                                                    // if (token) {
+                                                                    // config.headers.Authorization = `Bearer ${token}`
+                                                                    // }
+                                                                    return config
+                                                                    },
+                                                                    (error) => {
+                                                                    return Promise.reject(error)
+                                                                    }
+                                                                    )
+
+                                                                    // 响应拦截器
+                                                                    this.instance.interceptors.response.use(
+                                                                    (response) => {
+                                                                    return response.data
+                                                                    },
+                                                                    (error) => {
+                                                                    // TODO: 统一错误处理
+                                                                    console.error('API Error:', error)
+                                                                    return Promise.reject(error)
+                                                                    }
+                                                                    )
+                                                                    }
+
+                                                                    <% if (endpoints && endpoints.length> 0) { %>
+                                                                      <% endpoints.forEach(endpoint=> { %>
+                                                                        /**
+                                                                        * <%= endpoint.name %> - <%= endpoint.method %>
+                                                                            <%= endpoint.path %>
+                                                                              */
+                                                                              async <%= camelCase(endpoint.name) %>(<%
+                                                                                  if (endpoint.params &&
+                                                                                  endpoint.params.length> 0) { %>params
+                                                                                  <% if (lang==='ts' ) { %>: <%=
+                                                                                      pascalCase(endpoint.name) %>Params
+                                                                                      <% } %>
+                                                                                        <% if (endpoint.body) { %>, <% }
+                                                                                            %>
+                                                                                            <% } %>
+                                                                                              <% if (endpoint.body) { %>
+                                                                                                data<% if (lang==='ts' )
+                                                                                                  { %>: <%=
+                                                                                                    pascalCase(endpoint.name)
+                                                                                                    %>Body<% } %>
+                                                                                                      <% } %>)<% if
+                                                                                                          (lang==='ts' )
+                                                                                                          { %>: Promise
+                                                                                                          <<% if
+                                                                                                            (endpoint.response)
+                                                                                                            { %>
+                                                                                                            <%=
+                                                                                                              pascalCase(endpoint.name)
+                                                                                                              %>Response
+                                                                                                              <% } else
+                                                                                                                { %>any
+                                                                                                                <% } %>>
+                                                                                                                  <% }
+                                                                                                                    %> {
+                                                                                                                    <% if
+                                                                                                                      (endpoint.method==='GET'
+                                                                                                                      )
+                                                                                                                      {
+                                                                                                                      %>
+                                                                                                                      return
+                                                                                                                      this.instance.get('
+                                                                                                                      <%=
+                                                                                                                        endpoint.path
+                                                                                                                        %>
+                                                                                                                        '
+                                                                                                                        <% if
+                                                                                                                          (endpoint.params
+                                                                                                                          &&
+                                                                                                                          endpoint.params.length>
+                                                                                                                          0)
+                                                                                                                          {
+                                                                                                                          %>,
+                                                                                                                          {
+                                                                                                                          params
+                                                                                                                          }
+                                                                                                                          <% }
+                                                                                                                            %>
+                                                                                                                            )
+                                                                                                                            <% }
+                                                                                                                              else
+                                                                                                                              if
+                                                                                                                              (endpoint.method==='POST'
+                                                                                                                              )
+                                                                                                                              {
+                                                                                                                              %>
+                                                                                                                              return
+                                                                                                                              this.instance.post('
+                                                                                                                              <%=
+                                                                                                                                endpoint.path
+                                                                                                                                %>
+                                                                                                                                '
+                                                                                                                                <% if
+                                                                                                                                  (endpoint.body)
+                                                                                                                                  {
+                                                                                                                                  %>
+                                                                                                                                  ,
+                                                                                                                                  data
+                                                                                                                                  <% }
+                                                                                                                                    else
+                                                                                                                                    {
+                                                                                                                                    %>
+                                                                                                                                    ,
+                                                                                                                                    {}
+                                                                                                                                    <% }
+                                                                                                                                      %>
+                                                                                                                                      <% if
+                                                                                                                                        (endpoint.params
+                                                                                                                                        &&
+                                                                                                                                        endpoint.params.length>
+                                                                                                                                        0)
+                                                                                                                                        {
+                                                                                                                                        %>,
+                                                                                                                                        {
+                                                                                                                                        params
+                                                                                                                                        }
+                                                                                                                                        <% }
+                                                                                                                                          %>
+                                                                                                                                          )
+                                                                                                                                          <% }
+                                                                                                                                            else
+                                                                                                                                            if
+                                                                                                                                            (endpoint.method==='PUT'
+                                                                                                                                            )
+                                                                                                                                            {
+                                                                                                                                            %>
+                                                                                                                                            return
+                                                                                                                                            this.instance.put('
+                                                                                                                                            <%=
+                                                                                                                                              endpoint.path
+                                                                                                                                              %>
+                                                                                                                                              '
+                                                                                                                                              <% if
+                                                                                                                                                (endpoint.body)
+                                                                                                                                                {
+                                                                                                                                                %>
+                                                                                                                                                ,
+                                                                                                                                                data
+                                                                                                                                                <% }
+                                                                                                                                                  else
+                                                                                                                                                  {
+                                                                                                                                                  %>
+                                                                                                                                                  ,
+                                                                                                                                                  {}
+                                                                                                                                                  <% }
+                                                                                                                                                    %>
+                                                                                                                                                    <% if
+                                                                                                                                                      (endpoint.params
+                                                                                                                                                      &&
+                                                                                                                                                      endpoint.params.length>
+                                                                                                                                                      0)
+                                                                                                                                                      {
+                                                                                                                                                      %>,
+                                                                                                                                                      {
+                                                                                                                                                      params
+                                                                                                                                                      }
+                                                                                                                                                      <% }
+                                                                                                                                                        %>
+                                                                                                                                                        )
+                                                                                                                                                        <% }
+                                                                                                                                                          else
+                                                                                                                                                          if
+                                                                                                                                                          (endpoint.method==='DELETE'
+                                                                                                                                                          )
+                                                                                                                                                          {
+                                                                                                                                                          %>
+                                                                                                                                                          return
+                                                                                                                                                          this.instance.delete('
+                                                                                                                                                          <%=
+                                                                                                                                                            endpoint.path
+                                                                                                                                                            %>
+                                                                                                                                                            '
+                                                                                                                                                            <% if
+                                                                                                                                                              (endpoint.params
+                                                                                                                                                              &&
+                                                                                                                                                              endpoint.params.length>
+                                                                                                                                                              0)
+                                                                                                                                                              {
+                                                                                                                                                              %>,
+                                                                                                                                                              {
+                                                                                                                                                              params
+                                                                                                                                                              }
+                                                                                                                                                              <% }
+                                                                                                                                                                %>
+                                                                                                                                                                )
+                                                                                                                                                                <% }
+                                                                                                                                                                  else
+                                                                                                                                                                  if
+                                                                                                                                                                  (endpoint.method==='PATCH'
+                                                                                                                                                                  )
+                                                                                                                                                                  {
+                                                                                                                                                                  %>
+                                                                                                                                                                  return
+                                                                                                                                                                  this.instance.patch('
+                                                                                                                                                                  <%=
+                                                                                                                                                                    endpoint.path
+                                                                                                                                                                    %>
+                                                                                                                                                                    '
+                                                                                                                                                                    <% if
+                                                                                                                                                                      (endpoint.body)
+                                                                                                                                                                      {
+                                                                                                                                                                      %>
+                                                                                                                                                                      ,
+                                                                                                                                                                      data
+                                                                                                                                                                      <% }
+                                                                                                                                                                        else
+                                                                                                                                                                        {
+                                                                                                                                                                        %>
+                                                                                                                                                                        ,
+                                                                                                                                                                        {}
+                                                                                                                                                                        <% }
+                                                                                                                                                                          %>
+                                                                                                                                                                          <% if
+                                                                                                                                                                            (endpoint.params
+                                                                                                                                                                            &&
+                                                                                                                                                                            endpoint.params.length>
+                                                                                                                                                                            0)
+                                                                                                                                                                            {
+                                                                                                                                                                            %>,
+                                                                                                                                                                            {
+                                                                                                                                                                            params
+                                                                                                                                                                            }
+                                                                                                                                                                            <% }
+                                                                                                                                                                              %>
+                                                                                                                                                                              )
+                                                                                                                                                                              <% }
+                                                                                                                                                                                %>
+                                                                                                                                                                                }
+
+                                                                                                                                                                                <% })
+                                                                                                                                                                                  %>
+                                                                                                                                                                                  <% }
+                                                                                                                                                                                    else
+                                                                                                                                                                                    {
+                                                                                                                                                                                    %>
+                                                                                                                                                                                    /**
+                                                                                                                                                                                    *
+                                                                                                                                                                                    示例
+                                                                                                                                                                                    GET
+                                                                                                                                                                                    请求
+                                                                                                                                                                                    */
+                                                                                                                                                                                    async
+                                                                                                                                                                                    getList(params
+                                                                                                                                                                                    <% if
+                                                                                                                                                                                      (lang==='ts'
+                                                                                                                                                                                      )
+                                                                                                                                                                                      {
+                                                                                                                                                                                      %>
+                                                                                                                                                                                      ?:
+                                                                                                                                                                                      any
+                                                                                                                                                                                      <% }
+                                                                                                                                                                                        %>
+                                                                                                                                                                                        )
+                                                                                                                                                                                        <% if
+                                                                                                                                                                                          (lang==='ts'
+                                                                                                                                                                                          )
+                                                                                                                                                                                          {
+                                                                                                                                                                                          %>
+                                                                                                                                                                                          :
+                                                                                                                                                                                          Promise
+                                                                                                                                                                                          <any>
+                                                                                                                                                                                            <% }
+                                                                                                                                                                                              %>
+                                                                                                                                                                                              {
+                                                                                                                                                                                              return
+                                                                                                                                                                                              this.instance.get('/',
+                                                                                                                                                                                              {
+                                                                                                                                                                                              params
+                                                                                                                                                                                              })
+                                                                                                                                                                                              }
+
+                                                                                                                                                                                              /**
+                                                                                                                                                                                              *
+                                                                                                                                                                                              示例
+                                                                                                                                                                                              GET
+                                                                                                                                                                                              单个资源
+                                                                                                                                                                                              */
+                                                                                                                                                                                              async
+                                                                                                                                                                                              getDetail(id
+                                                                                                                                                                                              <% if
+                                                                                                                                                                                                (lang==='ts'
+                                                                                                                                                                                                )
+                                                                                                                                                                                                {
+                                                                                                                                                                                                %>
+                                                                                                                                                                                                :
+                                                                                                                                                                                                string
+                                                                                                                                                                                                <% }
+                                                                                                                                                                                                  %>
+                                                                                                                                                                                                  )
+                                                                                                                                                                                                  <% if
+                                                                                                                                                                                                    (lang==='ts'
+                                                                                                                                                                                                    )
+                                                                                                                                                                                                    {
+                                                                                                                                                                                                    %>
+                                                                                                                                                                                                    :
+                                                                                                                                                                                                    Promise
+                                                                                                                                                                                                    <any>
+                                                                                                                                                                                                      <% }
+                                                                                                                                                                                                        %>
+                                                                                                                                                                                                        {
+                                                                                                                                                                                                        return
+                                                                                                                                                                                                        this.instance.get(`/${id}`)
+                                                                                                                                                                                                        }
+
+                                                                                                                                                                                                        /**
+                                                                                                                                                                                                        *
+                                                                                                                                                                                                        示例
+                                                                                                                                                                                                        POST
+                                                                                                                                                                                                        请求
+                                                                                                                                                                                                        */
+                                                                                                                                                                                                        async
+                                                                                                                                                                                                        create(data
+                                                                                                                                                                                                        <% if
+                                                                                                                                                                                                          (lang==='ts'
+                                                                                                                                                                                                          )
+                                                                                                                                                                                                          {
+                                                                                                                                                                                                          %>
+                                                                                                                                                                                                          :
+                                                                                                                                                                                                          any
+                                                                                                                                                                                                          <% }
+                                                                                                                                                                                                            %>
+                                                                                                                                                                                                            )
+                                                                                                                                                                                                            <% if
+                                                                                                                                                                                                              (lang==='ts'
+                                                                                                                                                                                                              )
+                                                                                                                                                                                                              {
+                                                                                                                                                                                                              %>
+                                                                                                                                                                                                              :
+                                                                                                                                                                                                              Promise
+                                                                                                                                                                                                              <any>
+                                                                                                                                                                                                                <% }
+                                                                                                                                                                                                                  %>
+                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                  return
+                                                                                                                                                                                                                  this.instance.post('/',
+                                                                                                                                                                                                                  data)
+                                                                                                                                                                                                                  }
+
+                                                                                                                                                                                                                  /**
+                                                                                                                                                                                                                  *
+                                                                                                                                                                                                                  示例
+                                                                                                                                                                                                                  PUT
+                                                                                                                                                                                                                  请求
+                                                                                                                                                                                                                  */
+                                                                                                                                                                                                                  async
+                                                                                                                                                                                                                  update(id
+                                                                                                                                                                                                                  <% if
+                                                                                                                                                                                                                    (lang==='ts'
+                                                                                                                                                                                                                    )
+                                                                                                                                                                                                                    {
+                                                                                                                                                                                                                    %>
+                                                                                                                                                                                                                    :
+                                                                                                                                                                                                                    string
+                                                                                                                                                                                                                    <% }
+                                                                                                                                                                                                                      %>
+                                                                                                                                                                                                                      ,
+                                                                                                                                                                                                                      data
+                                                                                                                                                                                                                      <% if
+                                                                                                                                                                                                                        (lang==='ts'
+                                                                                                                                                                                                                        )
+                                                                                                                                                                                                                        {
+                                                                                                                                                                                                                        %>
+                                                                                                                                                                                                                        :
+                                                                                                                                                                                                                        any
+                                                                                                                                                                                                                        <% }
+                                                                                                                                                                                                                          %>
+                                                                                                                                                                                                                          )
+                                                                                                                                                                                                                          <% if
+                                                                                                                                                                                                                            (lang==='ts'
+                                                                                                                                                                                                                            )
+                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                            %>
+                                                                                                                                                                                                                            :
+                                                                                                                                                                                                                            Promise
+                                                                                                                                                                                                                            <any>
+                                                                                                                                                                                                                              <% }
+                                                                                                                                                                                                                                %>
+                                                                                                                                                                                                                                {
+                                                                                                                                                                                                                                return
+                                                                                                                                                                                                                                this.instance.put(`/${id}`,
+                                                                                                                                                                                                                                data)
+                                                                                                                                                                                                                                }
+
+                                                                                                                                                                                                                                /**
+                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                示例
+                                                                                                                                                                                                                                DELETE
+                                                                                                                                                                                                                                请求
+                                                                                                                                                                                                                                */
+                                                                                                                                                                                                                                async
+                                                                                                                                                                                                                                remove(id
+                                                                                                                                                                                                                                <% if
+                                                                                                                                                                                                                                  (lang==='ts'
+                                                                                                                                                                                                                                  )
+                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                  %>
+                                                                                                                                                                                                                                  :
+                                                                                                                                                                                                                                  string
+                                                                                                                                                                                                                                  <% }
+                                                                                                                                                                                                                                    %>
+                                                                                                                                                                                                                                    )
+                                                                                                                                                                                                                                    <% if
+                                                                                                                                                                                                                                      (lang==='ts'
+                                                                                                                                                                                                                                      )
+                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                      %>
+                                                                                                                                                                                                                                      :
+                                                                                                                                                                                                                                      Promise
+                                                                                                                                                                                                                                      <any>
+                                                                                                                                                                                                                                        <% }
+                                                                                                                                                                                                                                          %>
+                                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                                          return
+                                                                                                                                                                                                                                          this.instance.delete(`/${id}`)
+                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                          <% }
+                                                                                                                                                                                                                                            %>
+                                                                                                                                                                                                                                            }
+
+                                                                                                                                                                                                                                            //
+                                                                                                                                                                                                                                            创建实例
+                                                                                                                                                                                                                                            const
+                                                                                                                                                                                                                                            <%=
+                                                                                                                                                                                                                                              camelCase(name)
+                                                                                                                                                                                                                                              %>
+                                                                                                                                                                                                                                              Api
+                                                                                                                                                                                                                                              =
+                                                                                                                                                                                                                                              new
+                                                                                                                                                                                                                                              <%=
+                                                                                                                                                                                                                                                pascalCase(name)
+                                                                                                                                                                                                                                                %>
+                                                                                                                                                                                                                                                Api()
+
+                                                                                                                                                                                                                                                //
+                                                                                                                                                                                                                                                导出方法
+                                                                                                                                                                                                                                                <% if
+                                                                                                                                                                                                                                                  (endpoints
+                                                                                                                                                                                                                                                  &&
+                                                                                                                                                                                                                                                  endpoints.length>
+                                                                                                                                                                                                                                                  0)
+                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                  %>
+                                                                                                                                                                                                                                                  <%
+                                                                                                                                                                                                                                                    endpoints.forEach(endpoint=>
+                                                                                                                                                                                                                                                    {
+                                                                                                                                                                                                                                                    %>
+                                                                                                                                                                                                                                                    export
+                                                                                                                                                                                                                                                    const
+                                                                                                                                                                                                                                                    <%=
+                                                                                                                                                                                                                                                      camelCase(endpoint.name)
+                                                                                                                                                                                                                                                      %>
+                                                                                                                                                                                                                                                      =
+                                                                                                                                                                                                                                                      <%=
+                                                                                                                                                                                                                                                        camelCase(name)
+                                                                                                                                                                                                                                                        %>
+                                                                                                                                                                                                                                                        Api.
+                                                                                                                                                                                                                                                        <%=
+                                                                                                                                                                                                                                                          camelCase(endpoint.name)
+                                                                                                                                                                                                                                                          %>
+                                                                                                                                                                                                                                                          .bind(
+                                                                                                                                                                                                                                                          <%=
+                                                                                                                                                                                                                                                            camelCase(name)
+                                                                                                                                                                                                                                                            %>
+                                                                                                                                                                                                                                                            Api)
+                                                                                                                                                                                                                                                            <% })
+                                                                                                                                                                                                                                                              %>
+                                                                                                                                                                                                                                                              <% }
+                                                                                                                                                                                                                                                                else
+                                                                                                                                                                                                                                                                {
+                                                                                                                                                                                                                                                                %>
+                                                                                                                                                                                                                                                                export
+                                                                                                                                                                                                                                                                const
+                                                                                                                                                                                                                                                                getList
+                                                                                                                                                                                                                                                                =
+                                                                                                                                                                                                                                                                <%=
+                                                                                                                                                                                                                                                                  camelCase(name)
+                                                                                                                                                                                                                                                                  %>
+                                                                                                                                                                                                                                                                  Api.getList.bind(
+                                                                                                                                                                                                                                                                  <%=
+                                                                                                                                                                                                                                                                    camelCase(name)
+                                                                                                                                                                                                                                                                    %>
+                                                                                                                                                                                                                                                                    Api)
+                                                                                                                                                                                                                                                                    export
+                                                                                                                                                                                                                                                                    const
+                                                                                                                                                                                                                                                                    getDetail
+                                                                                                                                                                                                                                                                    =
+                                                                                                                                                                                                                                                                    <%=
+                                                                                                                                                                                                                                                                      camelCase(name)
+                                                                                                                                                                                                                                                                      %>
+                                                                                                                                                                                                                                                                      Api.getDetail.bind(
+                                                                                                                                                                                                                                                                      <%=
+                                                                                                                                                                                                                                                                        camelCase(name)
+                                                                                                                                                                                                                                                                        %>
+                                                                                                                                                                                                                                                                        Api)
+                                                                                                                                                                                                                                                                        export
+                                                                                                                                                                                                                                                                        const
+                                                                                                                                                                                                                                                                        create
+                                                                                                                                                                                                                                                                        =
+                                                                                                                                                                                                                                                                        <%=
+                                                                                                                                                                                                                                                                          camelCase(name)
+                                                                                                                                                                                                                                                                          %>
+                                                                                                                                                                                                                                                                          Api.create.bind(
+                                                                                                                                                                                                                                                                          <%=
+                                                                                                                                                                                                                                                                            camelCase(name)
+                                                                                                                                                                                                                                                                            %>
+                                                                                                                                                                                                                                                                            Api)
+                                                                                                                                                                                                                                                                            export
+                                                                                                                                                                                                                                                                            const
+                                                                                                                                                                                                                                                                            update
+                                                                                                                                                                                                                                                                            =
+                                                                                                                                                                                                                                                                            <%=
+                                                                                                                                                                                                                                                                              camelCase(name)
+                                                                                                                                                                                                                                                                              %>
+                                                                                                                                                                                                                                                                              Api.update.bind(
+                                                                                                                                                                                                                                                                              <%=
+                                                                                                                                                                                                                                                                                camelCase(name)
+                                                                                                                                                                                                                                                                                %>
+                                                                                                                                                                                                                                                                                Api)
+                                                                                                                                                                                                                                                                                export
+                                                                                                                                                                                                                                                                                const
+                                                                                                                                                                                                                                                                                remove
+                                                                                                                                                                                                                                                                                =
+                                                                                                                                                                                                                                                                                <%=
+                                                                                                                                                                                                                                                                                  camelCase(name)
+                                                                                                                                                                                                                                                                                  %>
+                                                                                                                                                                                                                                                                                  Api.remove.bind(
+                                                                                                                                                                                                                                                                                  <%=
+                                                                                                                                                                                                                                                                                    camelCase(name)
+                                                                                                                                                                                                                                                                                    %>
+                                                                                                                                                                                                                                                                                    Api)
+                                                                                                                                                                                                                                                                                    <% }
+                                                                                                                                                                                                                                                                                      %>
+
+                                                                                                                                                                                                                                                                                      export
+                                                                                                                                                                                                                                                                                      default
+                                                                                                                                                                                                                                                                                      <%=
+                                                                                                                                                                                                                                                                                        camelCase(name)
+                                                                                                                                                                                                                                                                                        %>
+                                                                                                                                                                                                                                                                                        Api

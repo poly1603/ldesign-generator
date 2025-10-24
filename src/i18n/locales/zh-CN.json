@@ -1,0 +1,106 @@
+{
+  "common": {
+    "success": "成功",
+    "failed": "失败",
+    "warning": "警告",
+    "error": "错误",
+    "cancel": "取消",
+    "confirm": "确认",
+    "yes": "是",
+    "no": "否",
+    "loading": "加载中...",
+    "processing": "处理中...",
+    "completed": "已完成",
+    "name": "名称",
+    "description": "描述",
+    "type": "类型",
+    "path": "路径",
+    "size": "大小",
+    "date": "日期"
+  },
+  "cli": {
+    "welcome": "欢迎使用 LDesign Generator",
+    "selectOperation": "请选择操作",
+    "enterName": "请输入名称",
+    "enterDescription": "请输入描述（可选）",
+    "selectFramework": "请选择框架",
+    "selectTemplate": "请选择模板",
+    "selectStyle": "请选择样式类型",
+    "withStyle": "是否生成样式文件？",
+    "withTest": "是否生成测试文件？",
+    "withApi": "是否生成 API 调用？",
+    "withStore": "是否生成状态管理？",
+    "outputDir": "输出目录",
+    "generating": "正在生成...",
+    "generated": "生成完成！",
+    "generatedFiles": "生成了 {count} 个文件"
+  },
+  "generator": {
+    "componentGenerated": "组件已生成",
+    "pageGenerated": "页面已生成",
+    "apiGenerated": "API 已生成",
+    "storeGenerated": "Store 已生成",
+    "hookGenerated": "Hook 已生成",
+    "templateNotFound": "模板文件不存在: {template}",
+    "generationFailed": "生成失败: {error}",
+    "fileAlreadyExists": "文件已存在: {path}",
+    "invalidConfig": "无效的配置",
+    "invalidTemplate": "无效的模板"
+  },
+  "plugin": {
+    "registered": "插件已注册: {name}",
+    "loaded": "插件已加载: {name}",
+    "unloaded": "插件已卸载: {name}",
+    "notFound": "插件未找到: {name}",
+    "alreadyRegistered": "插件已经注册: {name}",
+    "executionFailed": "插件执行失败: {name}"
+  },
+  "validation": {
+    "syntaxError": "语法错误",
+    "missingField": "缺少必需字段: {field}",
+    "invalidIndentation": "缩进不一致",
+    "lineTooLong": "行过长",
+    "missingComments": "缺少注释",
+    "inlineStyle": "检测到内联样式",
+    "hardcodedValue": "检测到硬编码值",
+    "validationPassed": "验证通过",
+    "validationFailed": "验证失败: {errors} 个错误, {warnings} 个警告"
+  },
+  "cache": {
+    "hit": "缓存命中",
+    "miss": "缓存未命中",
+    "cleared": "缓存已清空",
+    "stats": "缓存统计: 命中率 {rate}, 大小 {size}/{capacity}"
+  },
+  "history": {
+    "noHistory": "没有历史记录",
+    "recordAdded": "历史记录已添加",
+    "recordDeleted": "历史记录已删除",
+    "historyCleared": "历史记录已清空",
+    "exported": "历史记录已导出: {path}"
+  },
+  "rollback": {
+    "confirm": "确定要回滚此操作吗？",
+    "success": "回滚成功",
+    "failed": "回滚失败",
+    "fileModified": "文件已被修改，跳过: {path}",
+    "fileDeleted": "文件已删除: {path}",
+    "backupCreated": "备份已创建: {path}"
+  },
+  "batch": {
+    "starting": "开始批量生成 {count} 个文件",
+    "processing": "批量生成中... ({current}/{total})",
+    "completed": "批量生成完成！成功 {success}/{total}",
+    "partialSuccess": "批量生成完成，成功 {success}/{total}，失败 {failed}"
+  },
+  "error": {
+    "unknown": "未知错误",
+    "fileNotFound": "文件未找到: {path}",
+    "permissionDenied": "权限不足",
+    "invalidInput": "无效的输入",
+    "networkError": "网络错误",
+    "timeout": "操作超时"
+  }
+}
+
+

@@ -1,0 +1,66 @@
+<template>
+  <div class="<%= kebabCase(componentName) %>">
+    <% if (description) { %><!-- <%= description %> -->
+      <% } %>
+        <%= componentName %>
+  </div>
+</template>
+
+<% if (withScript !==false) { %>
+  <script <% if (lang==='ts' ) { %>lang = "ts" <% } %> setup >
+<% if (props && props.length > 0) { %>
+<% if (lang === 'ts') { %>
+        interface Props {
+<% props.forEach(prop => { %>
+  <%= prop.name %><%= prop.required === false ? '?' : '' %>: <%= prop.type %><% if (prop.default !== undefined) { %> // default: <%= JSON.stringify(prop.default) %><% } %>
+<% }) %>
+}
+
+        const props = <% if (withTypes !== false) { %> withDefaults(defineProps < Props > (), {
+<% props.filter(p => p.default !== undefined).forEach((prop, index, arr) => { %>
+  <%= prop.name %>: <%= typeof prop.default === 'string' ? `'${prop.default}'` : prop.default %><%= index < arr.length - 1 ? ',' : '' %>
+<% }) %>
+})<% } else { %> defineProps < Props > () <% } %>
+<% } else { %>
+const props = defineProps({
+<% props.forEach(prop => { %>
+  <%= prop.name %>: {
+            type: <%= prop.type %>,
+    <% if (prop.required !== false) { %> required: true,<% } %>
+    <% if (prop.default !== undefined) { %>default: <%= typeof prop.default === 'string' ? `'${prop.default}'` : prop.default %><% } %>
+  },
+<% }) %>
+})
+<% } %>
+<% } %>
+
+<% if (emits && emits.length > 0) { %>
+<% if (lang === 'ts') { %>
+const emit = defineEmits < {
+<% emits.forEach(event => { %>
+  <%= event %>: [payload ?: any]
+                <% }) %>
+}> ()
+        <% } else { %>
+const emit = defineEmits([<%= emits.map(e => `'${e}'`).join(', ') %>])
+        <% } %>
+<% } %>
+
+    // TODO: 实现组件逻辑
+  </script>
+  <% } %>
+
+    <% if (withStyle !==false) { %>
+      <style <% if (styleType==='scss' ) { %>
+        lang="scss" <%
+        }
+
+        else if (styleType==='less') {
+          %>lang="less" <%
+        }
+
+        %>scoped>.<%=kebabCase(componentName) %> {
+          /* 添加样式 */
+        }
+      </style>
+      <% } %>

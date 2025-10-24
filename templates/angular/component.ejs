@@ -1,0 +1,110 @@
+import { Component<% if (props && props.length> 0) { %>, Input<% } %>
+    <% if (emits && emits.length> 0) { %>, Output, EventEmitter<% } %>
+        <% if (lifecycle) { %>, OnInit, OnDestroy<% } %> } from '@angular/core'
+            <% if (withService) { %>import { <%= pascalCase(name) %>Service } from './<%= kebabCase(name) %>.service'<%
+                    } %>
+
+                    /**
+                    * <%= pascalCase(name) %>
+                      <% if (description) { %> - <%= description %>
+                          <% } %>
+                            */
+                            @Component({
+                            selector: 'app-<%= kebabCase(name) %>',
+                              <% if (standalone) { %>standalone: true,<% } %>
+                                  templateUrl: './<%= kebabCase(name) %>.component.html',
+                                    <% if (withStyle) { %>styleUrls: ['./<%= kebabCase(name) %>.component.<%= styleType
+                                          || 'css' %>']<% } else { %>styles: []<% } %>
+                                              })
+                                              export class <%= pascalCase(name) %>Component<% if (lifecycle) { %>
+                                                  implements OnInit, OnDestroy<% } %> {
+                                                    <% if (props && props.length> 0) { %>
+                                                      // Inputs
+                                                      <% props.forEach(prop=> { %>
+                                                        @Input() <%= prop.name %>
+                                                          <%= prop.required===false ? '?' : '!' %>: <%= prop.type %>
+                                                              <% if (prop.default !==undefined) { %> = <%= typeof
+                                                                  prop.default==='string' ? `'${prop.default}'` :
+                                                                  prop.default %>
+                                                                  <% } %>
+                                                                    <% }) %>
+                                                                      <% } %>
+
+                                                                        <% if (emits && emits.length> 0) { %>
+                                                                          // Outputs
+                                                                          <% emits.forEach(emit=> { %>
+                                                                            @Output() <%= emit %> = new EventEmitter
+                                                                              <any>()
+                                                                                <% }) %>
+                                                                                  <% } %>
+
+                                                                                    // Properties
+                                                                                    loading = false
+                                                                                    data: any = null
+
+                                                                                    constructor(<% if (withService) { %>
+                                                                                      private <%= camelCase(name) %>
+                                                                                        Service: <%= pascalCase(name) %>
+                                                                                          Service<% } %>) { }
+
+                                                                                            <% if (lifecycle) { %>
+                                                                                              ngOnInit(): void {
+                                                                                              // TODO: 初始化逻辑
+                                                                                              this.loadData()
+                                                                                              }
+
+                                                                                              ngOnDestroy(): void {
+                                                                                              // TODO: 清理逻辑
+                                                                                              }
+                                                                                              <% } %>
+
+                                                                                                // Methods
+                                                                                                private loadData(): void
+                                                                                                {
+                                                                                                this.loading = true
+
+                                                                                                <% if (withService) { %>
+                                                                                                  this.<%=
+                                                                                                    camelCase(name) %>
+                                                                                                    Service.getData().subscribe({
+                                                                                                    next: (data) => {
+                                                                                                    this.data = data
+                                                                                                    this.loading = false
+                                                                                                    },
+                                                                                                    error: (error) => {
+                                                                                                    console.error('加载数据失败:',
+                                                                                                    error)
+                                                                                                    this.loading = false
+                                                                                                    }
+                                                                                                    })
+                                                                                                    <% } else { %>
+                                                                                                      // TODO: 实现数据加载逻辑
+                                                                                                      setTimeout(() => {
+                                                                                                      this.data = {
+                                                                                                      message: 'Hello
+                                                                                                      from <%=
+                                                                                                        pascalCase(name)
+                                                                                                        %>' }
+                                                                                                        this.loading =
+                                                                                                        false
+                                                                                                        }, 1000)
+                                                                                                        <% } %>
+                                                                                                          }
+
+                                                                                                          <% if (emits
+                                                                                                            &&
+                                                                                                            emits.length>
+                                                                                                            0) { %>
+                                                                                                            handleAction():
+                                                                                                            void {
+                                                                                                            // TODO:
+                                                                                                            实现操作逻辑
+                                                                                                            this.<%=
+                                                                                                              emits[0]
+                                                                                                              %>.emit({
+                                                                                                              data:
+                                                                                                              this.data
+                                                                                                              })
+                                                                                                              }
+                                                                                                              <% } %>
+                                                                                                                }
