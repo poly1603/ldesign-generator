@@ -2,6 +2,8 @@ import { Generator } from './generator'
 import type { GeneratorOptions, GenerateResult } from '../types'
 import { logger } from './logger'
 import { performanceMonitor } from './performance-monitor'
+import { TaskQueue, TaskPriority, createTaskQueue } from './task-queue'
+import { formatDuration } from '../utils/format-helpers'
 import chalk from 'chalk'
 import ora, { Ora } from 'ora'
 
@@ -37,14 +39,19 @@ export interface BatchGenerateResult {
 }
 
 /**
- * 批量生成器 - 支持并行批量生成
+ * 批量生成器 - 支持并行批量生成（优化版，使用任务队列）
  */
 export class BatchGenerator {
   private generator: Generator
   private spinner: Ora | null = null
+  private taskQueue: TaskQueue
 
   constructor(options: GeneratorOptions) {
     this.generator = new Generator(options)
+    this.taskQueue = createTaskQueue({
+      maxConcurrent: 5,
+      autoStart: false
+    })
   }
 
   /**
@@ -74,42 +81,65 @@ export class BatchGenerator {
 
     try {
       if (parallel) {
-        // 并行生成
-        const chunks = this.chunkArray(configs, maxConcurrency)
+        // 使用任务队列并行生成
+        this.taskQueue.updateConfig({ maxConcurrent: maxConcurrency })
+        this.taskQueue.start()
 
-        for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-          const chunk = chunks[chunkIndex]
+        // 添加所有任务到队列
+        const taskIds: string[] = []
+        for (let i = 0; i < configs.length; i++) {
+          const config = configs[i]
+          const taskId = await this.taskQueue.add({
+            name: `generate-${config.name}`,
+            priority: TaskPriority.NORMAL,
+            executor: () => this.generateSingle(config, i, continueOnError),
+            metadata: { index: i, config: config.name }
+          })
+          taskIds.push(taskId)
+        }
 
-          if (this.spinner) {
-            this.spinner.text = chalk.cyan(
-              `批量生成中... (${chunkIndex * maxConcurrency + 1}-${Math.min((chunkIndex + 1) * maxConcurrency, configs.length)}/${configs.length})`
-            )
-          }
+        // 监控进度
+        if (showProgress) {
+          const progressInterval = setInterval(() => {
+            const stats = this.taskQueue.getStats()
+            const completed = stats.completed + stats.failed
+            
+            if (this.spinner) {
+              this.spinner.text = chalk.cyan(
+                `批量生成中... (${completed}/${configs.length})`
+              )
+            }
 
-          const chunkResults = await Promise.allSettled(
-            chunk.map((config, localIndex) =>
-              this.generateSingle(config, chunkIndex * maxConcurrency + localIndex, continueOnError)
-            )
-          )
+            if (completed >= configs.length) {
+              clearInterval(progressInterval)
+            }
+          }, 200)
+        }
 
-          chunkResults.forEach((result, localIndex) => {
-            const globalIndex = chunkIndex * maxConcurrency + localIndex
+        // 等待所有任务完成
+        await this.taskQueue.waitAll(60000 * 5) // 5分钟超时
 
-            if (result.status === 'fulfilled') {
-              results.push(result.value)
+        // 收集结果
+        for (const taskId of taskIds) {
+          const taskResult = this.taskQueue.getResult(taskId)
+          if (taskResult) {
+            if (taskResult.status === 'completed') {
+              results.push(taskResult.result)
             } else {
               const errorResult: GenerateResult = {
                 success: false,
-                error: result.reason?.message || '未知错误',
+                error: taskResult.error?.message || '未知错误',
                 message: '生成失败'
               }
               results.push(errorResult)
+              
+              const index = taskResult.taskId ? parseInt(taskResult.taskId.split('-')[1]) : 0
               errors.push({
-                index: globalIndex,
-                error: result.reason?.message || '未知错误'
+                index,
+                error: taskResult.error?.message || '未知错误'
               })
             }
-          })
+          }
         }
       } else {
         // 串行生成
@@ -332,16 +362,24 @@ export class BatchGenerator {
   }
 
   /**
-   * 将数组分块
+   * 获取任务队列统计
    */
-  private chunkArray<T>(array: T[], chunkSize: number): T[][] {
-    const chunks: T[][] = []
+  getQueueStats() {
+    return this.taskQueue.getStats()
+  }
 
-    for (let i = 0; i < array.length; i += chunkSize) {
-      chunks.push(array.slice(i, i + chunkSize))
-    }
+  /**
+   * 清空任务队列
+   */
+  clearQueue(): void {
+    this.taskQueue.clear()
+  }
 
-    return chunks
+  /**
+   * 设置最大并发数
+   */
+  setMaxConcurrent(max: number): void {
+    this.taskQueue.updateConfig({ maxConcurrent: max })
   }
 }
 
@@ -366,18 +404,6 @@ function createProgressBar(value: number, max: number, width: number = 40): stri
   }
 }
 
-/**
- * 格式化时长
- */
-function formatDuration(ms: number): string {
-  if (ms < 1000) {
-    return `${ms.toFixed(0)}ms`
-  } else if (ms < 60000) {
-    return `${(ms / 1000).toFixed(2)}s`
-  } else {
-    return `${(ms / 60000).toFixed(2)}min`
-  }
-}
 
 /**
  * 创建批量生成器

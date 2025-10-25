@@ -80,8 +80,38 @@ export interface ApiOptions {
 }
 
 export interface TemplateData {
-  [key: string]: any
+  [key: string]: unknown
 }
+
+/**
+ * 命名风格类型
+ */
+export type NamingStyle = 'camelCase' | 'pascalCase' | 'kebabCase' | 'snakeCase' | 'constantCase'
+
+/**
+ * 模板引擎类型
+ */
+export type TemplateEngineType = 'ejs' | 'handlebars'
+
+/**
+ * 框架类型
+ */
+export type FrameworkType = 'vue' | 'react' | 'angular' | 'svelte' | 'common'
+
+/**
+ * 语言类型
+ */
+export type LanguageType = 'ts' | 'js' | 'tsx' | 'jsx'
+
+/**
+ * 样式类型
+ */
+export type StyleType = 'css' | 'scss' | 'less' | 'stylus' | 'none' | 'tailwind' | 'css-modules'
+
+/**
+ * 测试框架类型
+ */
+export type TestFrameworkType = 'vitest' | 'jest' | 'none'
 
 export interface TemplateMetadata {
   name: string
@@ -109,7 +139,7 @@ export interface PluginHooks {
 }
 
 export interface PluginContext {
-  generator: any
+  generator: Generator
   options: ComponentOptions | PageOptions | HookOptions | StoreOptions | ApiOptions
   templateName: string
   data: TemplateData
@@ -117,4 +147,40 @@ export interface PluginContext {
   config?: GeneratorConfig
 }
 
+/**
+ * 前向声明 Generator 类型
+ */
+export interface Generator {
+  getTemplateEngine(): TemplateEngine
+  getPluginManager(): PluginManager
+  generate(templateName: string, data: Record<string, any>): Promise<GenerateResult>
+  generateBatch(items: Array<{ template: string; data: Record<string, any> }>): Promise<GenerateResult[]>
+}
+
+/**
+ * 前向声明 TemplateEngine 类型
+ */
+export interface TemplateEngine {
+  render(templateName: string, data: Record<string, any>): Promise<string>
+  registerTemplate(name: string, content: string, metadata?: TemplateMetadata): void
+  registerHelper(name: string, fn: any): void
+}
+
+/**
+ * 前向声明 PluginManager 类型
+ */
+export interface PluginManager {
+  register(plugin: Plugin): void
+  registerBatch(plugins: Plugin[]): void
+  load(pluginName: string): void
+  loadAll(): void
+  getPlugin(pluginName: string): Plugin | undefined
+  getLoadedPlugins(): Plugin[]
+}
+
+// 导出错误类型
+export * from './errors'
+
+// 导出国际化类型
+export * from './i18n'
 

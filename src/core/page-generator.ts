@@ -1,5 +1,7 @@
 import { Generator } from './generator'
 import type { PageOptions, GenerateResult } from '../types'
+import { toPascalCase, toCamelCase, toKebabCase } from '../utils/string-helpers'
+import { validateComponentName } from './input-validator'
 
 /**
  * 页面生成器 - 专门用于生成完整页面
@@ -15,11 +17,13 @@ export class PageGenerator {
    * 生成 Vue 页面
    */
   async generateVuePage(options: PageOptions): Promise<GenerateResult> {
+    validateComponentName(options.name)
+
     const data = {
       pageName: options.name,
-      pascalCase: this.toPascalCase(options.name),
-      camelCase: this.toCamelCase(options.name),
-      kebabCase: this.toKebabCase(options.name),
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
       props: options.props || [],
       emits: options.emits || [],
       withScript: options.withScript !== false,
@@ -43,11 +47,13 @@ export class PageGenerator {
    * 生成 React 页面
    */
   async generateReactPage(options: PageOptions): Promise<GenerateResult> {
+    validateComponentName(options.name)
+
     const data = {
       pageName: options.name,
-      pascalCase: this.toPascalCase(options.name),
-      camelCase: this.toCamelCase(options.name),
-      kebabCase: this.toKebabCase(options.name),
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
       props: options.props || [],
       withStyle: options.withStyle !== false,
       withStore: options.withStore || false,
@@ -59,7 +65,7 @@ export class PageGenerator {
       framework: 'react',
       crudType: options.crudType || 'none',
       description: options.description,
-      outputFileName: `${this.toPascalCase(options.name)}.${options.lang || 'tsx'}`
+      outputFileName: `${toPascalCase(options.name)}.${options.lang || 'tsx'}`
     }
 
     return await this.generator.generate('react/page.ejs', data)
@@ -85,7 +91,7 @@ export class PageGenerator {
       withApi,
       withStore,
       lang,
-      route: `/${this.toKebabCase(name)}`
+      route: `/${toKebabCase(name)}`
     }
 
     // 生成详情页
@@ -95,7 +101,7 @@ export class PageGenerator {
       withApi,
       withStore,
       lang,
-      route: `/${this.toKebabCase(name)}/:id`
+      route: `/${toKebabCase(name)}/:id`
     }
 
     // 生成编辑页
@@ -105,7 +111,7 @@ export class PageGenerator {
       withApi,
       withStore,
       lang,
-      route: `/${this.toKebabCase(name)}/edit/:id`
+      route: `/${toKebabCase(name)}/edit/:id`
     }
 
     // 生成创建页
@@ -115,7 +121,7 @@ export class PageGenerator {
       withApi,
       withStore,
       lang,
-      route: `/${this.toKebabCase(name)}/create`
+      route: `/${toKebabCase(name)}/create`
     }
 
     if (type === 'vue') {
@@ -131,34 +137,6 @@ export class PageGenerator {
     }
 
     return results
-  }
-
-  /**
-   * 转换为 PascalCase
-   */
-  private toPascalCase(str: string): string {
-    return str
-      .replace(/[-_](.)/g, (_, c) => c.toUpperCase())
-      .replace(/^(.)/, (_, c) => c.toUpperCase())
-  }
-
-  /**
-   * 转换为 camelCase
-   */
-  private toCamelCase(str: string): string {
-    return str
-      .replace(/[-_](.)/g, (_, c) => c.toUpperCase())
-      .replace(/^(.)/, (_, c) => c.toLowerCase())
-  }
-
-  /**
-   * 转换为 kebab-case
-   */
-  private toKebabCase(str: string): string {
-    return str
-      .replace(/([a-z])([A-Z])/g, '$1-$2')
-      .replace(/[\s_]+/g, '-')
-      .toLowerCase()
   }
 }
 

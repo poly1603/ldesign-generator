@@ -1,5 +1,6 @@
 import { Generator } from './generator'
 import type { ApiOptions, GenerateResult } from '../types'
+import { toPascalCase, toCamelCase, toKebabCase } from '../utils/string-helpers'
 
 /**
  * API 生成器 - 专门用于生成 API 请求模块
@@ -17,16 +18,16 @@ export class ApiGenerator {
   async generateApi(options: ApiOptions): Promise<GenerateResult> {
     const data = {
       name: options.name,
-      pascalCase: this.toPascalCase(options.name),
-      camelCase: this.toCamelCase(options.name),
-      kebabCase: this.toKebabCase(options.name),
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
       baseUrl: options.baseUrl || '/api',
       endpoints: options.endpoints || [],
       withTypes: options.withTypes !== false,
       withMock: options.withMock || false,
       lang: 'ts',
       description: options.description,
-      outputFileName: `${this.toKebabCase(options.name)}.ts`
+      outputFileName: `${toKebabCase(options.name)}.ts`
     }
 
     return await this.generator.generate('common/api.ejs', data)
@@ -99,11 +100,11 @@ export class ApiGenerator {
     results.push(
       await this.generator.generate('common/types.ejs', {
         name,
-        pascalCase: this.toPascalCase(name),
-        camelCase: this.toCamelCase(name),
-        kebabCase: this.toKebabCase(name),
+        pascalCase: toPascalCase(name),
+        camelCase: toCamelCase(name),
+        kebabCase: toKebabCase(name),
         lang: 'ts',
-        outputFileName: `${this.toKebabCase(name)}.types.ts`
+        outputFileName: `${toKebabCase(name)}.types.ts`
       })
     )
 
@@ -112,44 +113,16 @@ export class ApiGenerator {
       results.push(
         await this.generator.generate('common/mock.ejs', {
           name,
-          pascalCase: this.toPascalCase(name),
-          camelCase: this.toCamelCase(name),
-          kebabCase: this.toKebabCase(name),
+          pascalCase: toPascalCase(name),
+          camelCase: toCamelCase(name),
+          kebabCase: toKebabCase(name),
           lang: 'ts',
-          outputFileName: `${this.toKebabCase(name)}.mock.ts`
+          outputFileName: `${toKebabCase(name)}.mock.ts`
         })
       )
     }
 
     return results
-  }
-
-  /**
-   * 转换为 PascalCase
-   */
-  private toPascalCase(str: string): string {
-    return str
-      .replace(/[-_](.)/g, (_, c) => c.toUpperCase())
-      .replace(/^(.)/, (_, c) => c.toUpperCase())
-  }
-
-  /**
-   * 转换为 camelCase
-   */
-  private toCamelCase(str: string): string {
-    return str
-      .replace(/[-_](.)/g, (_, c) => c.toUpperCase())
-      .replace(/^(.)/, (_, c) => c.toLowerCase())
-  }
-
-  /**
-   * 转换为 kebab-case
-   */
-  private toKebabCase(str: string): string {
-    return str
-      .replace(/([a-z])([A-Z])/g, '$1-$2')
-      .replace(/[\s_]+/g, '-')
-      .toLowerCase()
   }
 }
 

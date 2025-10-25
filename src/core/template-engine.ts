@@ -3,6 +3,8 @@ import Handlebars from 'handlebars'
 import fs from 'fs-extra'
 import path from 'path'
 import type { TemplateMetadata } from '../types'
+import { cacheManager } from './cache-manager'
+import { ErrorFactory } from './errors'
 
 /**
  * 模板引擎 - 支持 EJS 和 Handlebars，支持模板注册
@@ -10,50 +12,158 @@ import type { TemplateMetadata } from '../types'
 export class TemplateEngine {
   private customTemplates: Map<string, string> = new Map()
   private templateMetadata: Map<string, TemplateMetadata> = new Map()
+  private compiledEjsCache: Map<string, ejs.TemplateFunction> = new Map()
+  private compiledHandlebarsCache: Map<string, HandlebarsTemplateDelegate> = new Map()
 
   constructor(private templateDir: string) {
     this.registerDefaultHelpers()
   }
 
   /**
-   * 渲染模板
+   * 渲染模板（优化的缓存版本）
    */
   async render(templateName: string, data: Record<string, any>): Promise<string> {
-    let templateContent: string
+    try {
+      // 1. 获取模板内容（优先从缓存）
+      const templateContent = await this.getTemplateContent(templateName)
 
-    // 先检查是否是已注册的自定义模板
-    if (this.customTemplates.has(templateName)) {
-      templateContent = this.customTemplates.get(templateName)!
-    } else {
-      // 从文件系统读取模板
-      const templatePath = path.join(this.templateDir, templateName)
-      if (!(await fs.pathExists(templatePath))) {
-        throw new Error(`模板文件不存在: ${templatePath}`)
+      // 2. 添加常用的字符串转换函数到数据中
+      const enhancedData = this.enhanceTemplateData(data)
+
+      // 3. 根据文件扩展名选择模板引擎并渲染
+      const templateType = this.getTemplateType(templateName)
+      
+      if (templateType === 'ejs') {
+        return await this.renderEjs(templateName, templateContent, enhancedData)
+      } else if (templateType === 'handlebars') {
+        return this.renderHandlebars(templateName, templateContent, enhancedData)
       }
-      templateContent = await fs.readFile(templatePath, 'utf-8')
+
+      // 默认使用 EJS
+      return await this.renderEjs(templateName, templateContent, enhancedData)
+    } catch (error) {
+      if (error instanceof Error) {
+        throw ErrorFactory.templateSyntaxError(templateName, error)
+      }
+      throw error
+    }
+  }
+
+  /**
+   * 获取模板内容（带缓存）
+   */
+  private async getTemplateContent(templateName: string): Promise<string> {
+    // 1. 检查自定义模板
+    if (this.customTemplates.has(templateName)) {
+      return this.customTemplates.get(templateName)!
     }
 
-    // 添加常用的字符串转换函数到数据中
-    const enhancedData = {
+    // 2. 尝试从缓存获取
+    const cacheKey = `template:${templateName}`
+    const cachedContent = cacheManager.getTemplate(cacheKey)
+    if (cachedContent) {
+      return cachedContent
+    }
+
+    // 3. 从文件系统读取
+    const templatePath = path.join(this.templateDir, templateName)
+    if (!(await fs.pathExists(templatePath))) {
+      throw ErrorFactory.templateNotFound(templateName)
+    }
+
+    const content = await fs.readFile(templatePath, 'utf-8')
+
+    // 4. 缓存模板内容
+    cacheManager.setTemplate(cacheKey, content)
+
+    return content
+  }
+
+  /**
+   * 渲染 EJS 模板（带编译缓存）
+   */
+  private async renderEjs(
+    templateName: string,
+    templateContent: string,
+    data: Record<string, any>
+  ): Promise<string> {
+    // 尝试从本地缓存获取编译后的模板
+    let compiledTemplate = this.compiledEjsCache.get(templateName)
+
+    if (!compiledTemplate) {
+      // 编译模板
+      compiledTemplate = ejs.compile(templateContent, {
+        filename: templateName,
+        cache: true,
+        compileDebug: false
+      })
+
+      // 缓存编译后的模板
+      this.compiledEjsCache.set(templateName, compiledTemplate)
+      
+      // 同时缓存到全局缓存管理器
+      const cacheKey = `compiled:ejs:${templateName}`
+      cacheManager.setCompiledTemplate(cacheKey, compiledTemplate)
+    }
+
+    // 渲染
+    return compiledTemplate(data)
+  }
+
+  /**
+   * 渲染 Handlebars 模板（带编译缓存）
+   */
+  private renderHandlebars(
+    templateName: string,
+    templateContent: string,
+    data: Record<string, any>
+  ): string {
+    // 尝试从本地缓存获取编译后的模板
+    let compiledTemplate = this.compiledHandlebarsCache.get(templateName)
+
+    if (!compiledTemplate) {
+      // 编译模板
+      compiledTemplate = Handlebars.compile(templateContent)
+
+      // 缓存编译后的模板
+      this.compiledHandlebarsCache.set(templateName, compiledTemplate)
+      
+      // 同时缓存到全局缓存管理器
+      const cacheKey = `compiled:hbs:${templateName}`
+      cacheManager.setCompiledTemplate(cacheKey, compiledTemplate)
+    }
+
+    // 渲染
+    return compiledTemplate(data)
+  }
+
+  /**
+   * 增强模板数据（添加辅助函数）
+   */
+  private enhanceTemplateData(data: Record<string, any>): Record<string, any> {
+    return {
       ...data,
       camelCase: this.toCamelCase,
       pascalCase: this.toPascalCase,
       kebabCase: this.toKebabCase,
       snakeCase: this.toSnakeCase,
       upperCase: (str: string) => str.toUpperCase(),
-      lowerCase: (str: string) => str.toLowerCase()
+      lowerCase: (str: string) => str.toLowerCase(),
+      currentYear: () => new Date().getFullYear(),
+      currentDate: () => new Date().toISOString().split('T')[0]
     }
+  }
 
-    // 根据文件扩展名选择模板引擎
+  /**
+   * 获取模板类型
+   */
+  private getTemplateType(templateName: string): 'ejs' | 'handlebars' {
     if (templateName.endsWith('.ejs')) {
-      return ejs.render(templateContent, enhancedData)
+      return 'ejs'
     } else if (templateName.endsWith('.hbs') || templateName.endsWith('.handlebars')) {
-      const template = Handlebars.compile(templateContent)
-      return template(enhancedData)
+      return 'handlebars'
     }
-
-    // 默认使用 EJS
-    return ejs.render(templateContent, enhancedData)
+    return 'ejs' // 默认
   }
 
   /**
@@ -64,7 +174,69 @@ export class TemplateEngine {
     if (metadata) {
       this.templateMetadata.set(name, metadata)
     }
+    
+    // 清除相关缓存
+    this.clearTemplateCache(name)
+    
     console.log(`✓ 模板 "${name}" 已注册`)
+  }
+
+  /**
+   * 清除模板缓存
+   */
+  clearTemplateCache(templateName: string): void {
+    // 清除内容缓存
+    const contentCacheKey = `template:${templateName}`
+    cacheManager.invalidate('template', contentCacheKey)
+
+    // 清除编译缓存
+    this.compiledEjsCache.delete(templateName)
+    this.compiledHandlebarsCache.delete(templateName)
+    
+    const ejsCacheKey = `compiled:ejs:${templateName}`
+    const hbsCacheKey = `compiled:hbs:${templateName}`
+    cacheManager.invalidate('compiled', ejsCacheKey)
+    cacheManager.invalidate('compiled', hbsCacheKey)
+  }
+
+  /**
+   * 清除所有缓存
+   */
+  clearAllCache(): void {
+    this.compiledEjsCache.clear()
+    this.compiledHandlebarsCache.clear()
+    cacheManager.invalidate('template')
+    cacheManager.invalidate('compiled')
+  }
+
+  /**
+   * 预热缓存（预编译常用模板）
+   */
+  async warmupCache(templateNames: string[]): Promise<void> {
+    for (const templateName of templateNames) {
+      try {
+        // 预加载模板内容
+        await this.getTemplateContent(templateName)
+        
+        // 预编译模板
+        const content = await this.getTemplateContent(templateName)
+        const type = this.getTemplateType(templateName)
+        
+        if (type === 'ejs') {
+          const compiled = ejs.compile(content, {
+            filename: templateName,
+            cache: true,
+            compileDebug: false
+          })
+          this.compiledEjsCache.set(templateName, compiled)
+        } else {
+          const compiled = Handlebars.compile(content)
+          this.compiledHandlebarsCache.set(templateName, compiled)
+        }
+      } catch (error) {
+        console.warn(`预热模板 ${templateName} 失败:`, error)
+      }
+    }
   }
 
   /**

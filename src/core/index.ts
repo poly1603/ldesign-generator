@@ -21,6 +21,10 @@ export type { LogEntry, LoggerConfig } from './logger'
 export { CacheManager, cacheManager, createCacheManager } from './cache-manager'
 export type { CacheManagerConfig } from './cache-manager'
 
+// 持久化缓存
+export { PersistentCache, createPersistentCache } from './persistent-cache'
+export type { PersistentCacheConfig } from './persistent-cache'
+
 // 模板验证
 export { TemplateValidator, createValidator, validate, ValidationSeverity } from './template-validator'
 export type { ValidationResult, ValidationIssue, ValidatorConfig, ValidationRule } from './template-validator'
@@ -32,6 +36,10 @@ export type { DryRunResult, DryRunFile } from './dry-run-generator'
 // 批量生成
 export { BatchGenerator, createBatchGenerator } from './batch-generator'
 export type { BatchConfig, BatchGenerateOptions, BatchGenerateResult } from './batch-generator'
+
+// 任务队列
+export { TaskQueue, createTaskQueue, TaskStatus, TaskPriority } from './task-queue'
+export type { Task, TaskResult, TaskQueueConfig } from './task-queue'
 
 // 历史管理
 export { HistoryManager, historyManager } from './history-manager'
@@ -49,4 +57,20 @@ export type { PerformanceMetrics, PerformanceStats } from './performance-monitor
 export { PreviewGenerator, createPreviewGenerator } from './preview-generator'
 export type { PreviewOptions, PreviewResult } from './preview-generator'
 
+// 错误处理
+export {
+  GeneratorError,
+  TemplateError,
+  FileSystemError,
+  ConfigError,
+  PluginError,
+  ValidationError,
+  NetworkError,
+  ErrorFactory,
+  ErrorHandler
+} from './errors'
+
+// 输入验证
+export { InputValidator, validateTemplateName, validateFilePath, validateComponentName } from './input-validator'
+export type { ValidateResult, ValidationRule } from './input-validator'
 
