@@ -254,6 +254,135 @@ export class ComponentGenerator {
 
     return await this.generator.generate('react/store.ejs', data)
   }
+
+  /**
+   * 生成 Angular 组件
+   */
+  async generateAngularComponent(options: ComponentOptions & { standalone?: boolean; withService?: boolean }) {
+    validateComponentName(options.name)
+
+    const data = {
+      componentName: options.name,
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
+      props: options.props || [],
+      withStyle: options.withStyle !== false,
+      withTest: options.withTest || false,
+      withService: options.withService || false,
+      standalone: options.standalone || false,
+      styleType: options.styleType || 'css',
+      description: options.description,
+      outputFileName: `${toKebabCase(options.name)}.component.ts`
+    }
+
+    return await this.generator.generate('angular/component.ejs', data)
+  }
+
+  /**
+   * 生成 Angular 服务
+   */
+  async generateAngularService(options: {
+    name: string
+    withTypes?: boolean
+    retry?: boolean
+    apiUrl?: string
+    description?: string
+  }) {
+    const data = {
+      name: options.name,
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
+      withTypes: options.withTypes !== false,
+      retry: options.retry || false,
+      apiUrl: options.apiUrl || '/api',
+      description: options.description,
+      outputFileName: `${toKebabCase(options.name)}.service.ts`
+    }
+
+    return await this.generator.generate('angular/service.ejs', data)
+  }
+
+  /**
+   * 生成 Angular 模块
+   */
+  async generateAngularModule(options: {
+    name: string
+    components?: string[]
+    withRouter?: boolean
+    withForms?: boolean
+    routes?: Array<{ path: string; component: string }>
+    description?: string
+  }) {
+    const data = {
+      name: options.name,
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
+      components: options.components || [],
+      withRouter: options.withRouter || false,
+      withForms: options.withForms || false,
+      routes: options.routes || [],
+      description: options.description,
+      outputFileName: `${toKebabCase(options.name)}.module.ts`
+    }
+
+    return await this.generator.generate('angular/module.ejs', data)
+  }
+
+  /**
+   * 生成 Angular 指令
+   */
+  async generateAngularDirective(options: { name: string; description?: string }) {
+    const data = {
+      name: options.name,
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
+      description: options.description,
+      outputFileName: `${toKebabCase(options.name)}.directive.ts`
+    }
+
+    return await this.generator.generate('angular/directive.ejs', data)
+  }
+
+  /**
+   * 生成 Angular 管道
+   */
+  async generateAngularPipe(options: { name: string; description?: string }) {
+    const data = {
+      name: options.name,
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
+      description: options.description,
+      outputFileName: `${toKebabCase(options.name)}.pipe.ts`
+    }
+
+    return await this.generator.generate('angular/pipe.ejs', data)
+  }
+
+  /**
+   * 生成 Angular 路由守卫
+   */
+  async generateAngularGuard(options: {
+    name: string
+    type?: 'CanActivate' | 'CanActivateChild' | 'CanDeactivate' | 'CanLoad'
+    description?: string
+  }) {
+    const data = {
+      name: options.name,
+      pascalCase: toPascalCase(options.name),
+      camelCase: toCamelCase(options.name),
+      kebabCase: toKebabCase(options.name),
+      type: options.type || 'CanActivate',
+      description: options.description,
+      outputFileName: `${toKebabCase(options.name)}.guard.ts`
+    }
+
+    return await this.generator.generate('angular/guard.ejs', data)
+  }
 }
 
 

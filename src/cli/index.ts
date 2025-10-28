@@ -410,6 +410,216 @@ program
     }
   })
 
+// 批量生成
+program
+  .command('batch')
+  .alias('b')
+  .description('批量生成文件')
+  .option('--config <file>', '配置文件路径')
+  .option('--csv <file>', 'CSV 配置文件')
+  .option('--template <template>', '模板名称')
+  .option('--parallel', '并行生成')
+  .option('--max-concurrency <num>', '最大并发数', '5')
+  .option('--dry-run', '干运行模式')
+  .action(async (options) => {
+    const spinner = ora('正在批量生成...').start()
+
+    try {
+      const { BatchGenerator } = await import('../core')
+      const config = await loadConfig()
+      const templateDir = path.join(__dirname, '../../templates')
+      const outputDir = config.outputDir || './src'
+
+      const batchGen = new BatchGenerator({
+        templateDir,
+        outputDir
+      })
+
+      let configs
+      if (options.csv) {
+        // 从CSV加载
+        configs = await batchGen.loadConfigFromCSV(options.csv, options.template)
+      } else if (options.config) {
+        // 从配置文件加载
+        configs = await batchGen.loadConfigFromFile(options.config)
+      } else {
+        spinner.fail(chalk.red('请指定配置文件 (--config) 或 CSV 文件 (--csv)'))
+        return
+      }
+
+      if (options.dryRun) {
+        const result = await batchGen.dryRunBatch(configs)
+        spinner.succeed(chalk.blue('批量干运行完成'))
+        console.log(`\n将生成 ${chalk.bold(result.totalFiles)} 个文件`)
+        console.log(`预计大小: ${chalk.bold(result.estimatedSize)} bytes`)
+        if (result.warnings.length > 0) {
+          console.log(`\n${chalk.yellow('警告:')}`)}
+          result.warnings.forEach(w => console.log(`  - ${w}`))
+        }
+        return
+      }
+
+      const result = await batchGen.generateBatch(configs, {
+        parallel: options.parallel || false,
+        maxConcurrency: parseInt(options.maxConcurrency),
+        continueOnError: true,
+        showProgress: true
+      })
+
+      spinner.succeed(chalk.green(`批量生成完成: ${result.success}/${result.total} 成功`))
+      console.log(`\n耗时: ${result.duration}ms`)
+      if (result.errors.length > 0) {
+        console.log(`\n${chalk.red('错误:')}`)}
+        result.errors.forEach(e => console.log(`  - ${e}`))
+      }
+    } catch (error) {
+      spinner.fail(chalk.red('批量生成失败'))
+      console.error(error)
+    }
+  })
+
+// 回滚操作
+program
+  .command('rollback')
+  .alias('r')
+  .description('回滚最近的生成操作')
+  .option('--last', '回滚最后一次操作')
+  .option('--id <id>', '回滚指定操作ID')
+  .option('--dry-run', '干运行模式')
+  .option('--force', '强制回滚')
+  .action(async (options) => {
+    const spinner = ora('正在回滚...').start()
+
+    try {
+      const { rollbackManager, historyManager } = await import('../core')
+
+      if (options.last) {
+        const result = await rollbackManager.rollbackLast({
+          dryRun: options.dryRun || false,
+          force: options.force || false,
+          backup: true,
+          interactive: true
+        })
+
+        if (result.success) {
+          spinner.succeed(chalk.green('回滚成功'))
+          console.log(`删除了 ${result.filesDeleted} 个文件`)
+          if (result.backupPath) {
+            console.log(`备份位置: ${result.backupPath}`)
+          }
+        } else {
+          spinner.fail(chalk.red('回滚失败'))
+          if (result.error) {
+            console.error(result.error)
+          }
+        }
+      } else if (options.id) {
+        const result = await rollbackManager.rollback(options.id, {
+          dryRun: options.dryRun || false,
+          force: options.force || false,
+          backup: true
+        })
+
+        if (result.success) {
+          spinner.succeed(chalk.green('回滚成功'))
+        } else {
+          spinner.fail(chalk.red('回滚失败'))
+        }
+      } else {
+        spinner.fail(chalk.red('请指定 --last 或 --id <id>'))
+      }
+    } catch (error) {
+      spinner.fail(chalk.red('回滚失败'))
+      console.error(error)
+    }
+  })
+
+// 查看历史
+program
+  .command('history')
+  .description('查看生成历史')
+  .option('--limit <num>', '显示数量', '10')
+  .option('--operation <type>', '操作类型')
+  .option('--export <file>', '导出历史')
+  .action(async (options) => {
+    try {
+      const { historyManager } = await import('../core')
+
+      if (options.export) {
+        await historyManager.export(options.export, options.export.endsWith('.csv') ? 'csv' : 'json')
+        console.log(chalk.green(`✓ 历史已导出到: ${options.export}`))
+        return
+      }
+
+      const entries = historyManager.getRecent(parseInt(options.limit))
+      const stats = historyManager.getStats()
+
+      console.log(chalk.bold('\n生成历史:'))
+      console.log(`总操作: ${stats.total} | 成功: ${chalk.green(stats.successful)} | 失败: ${chalk.red(stats.failed)}`)
+      console.log(`成功率: ${stats.successRate} | 总文件: ${stats.totalFiles}\n`)
+
+      entries.forEach((entry, index) => {
+        const status = entry.success ? chalk.green('✓') : chalk.red('✗')
+        const date = new Date(entry.timestamp).toLocaleString()
+        console.log(`${status} [${index + 1}] ${entry.operation} - ${entry.templateName}`)
+        console.log(`   ${chalk.gray(date)} | ID: ${chalk.gray(entry.id.slice(0, 8))}`)
+        console.log(`   文件: ${entry.files.length}\n`)
+      })
+    } catch (error) {
+      console.error(chalk.red('获取历史失败'))
+      console.error(error)
+    }
+  })
+
+// 验证模板
+program
+  .command('validate')
+  .description('验证模板文件')
+  .option('--template <template>', '模板名称')
+  .option('--all', '验证所有模板')
+  .action(async (options) => {
+    const spinner = ora('正在验证模板...').start()
+
+    try {
+      const { validate, TemplateValidator } = await import('../core')
+      const fs = await import('fs-extra')
+      const glob = await import('fast-glob')
+      const templateDir = path.join(__dirname, '../../templates')
+
+      let templates: string[] = []
+      if (options.all) {
+        templates = await glob.default('**/*.ejs', { cwd: templateDir })
+      } else if (options.template) {
+        templates = [options.template]
+      } else {
+        spinner.fail(chalk.red('请指定 --template <name> 或 --all'))
+        return
+      }
+
+      let totalValid = 0
+      let totalInvalid = 0
+
+      for (const template of templates) {
+        const content = await fs.readFile(path.join(templateDir, template), 'utf-8')
+        const result = validate(content, 'ejs')
+
+        if (result.valid) {
+          totalValid++
+          console.log(`${chalk.green('✓')} ${template}`)
+        } else {
+          totalInvalid++
+          console.log(`${chalk.red('✗')} ${template}`)
+          console.log(TemplateValidator.formatResult(result))
+        }
+      }
+
+      spinner.succeed(chalk.green(`验证完成: ${totalValid} 个有效, ${totalInvalid} 个无效`))
+    } catch (error) {
+      spinner.fail(chalk.red('验证失败'))
+      console.error(error)
+    }
+  })
+
 // 初始化配置
 program
   .command('init')
