@@ -103,5 +103,20 @@ import { defineStore } from 'pinia'
                                                                                                     }
                                                                                                     }<% if (withPersist)
                                                                                                       { %>, {
-                                                                                                      persist: true
+                                                                                                      persist: {
+                                                                                                      // 启用持久化
+                                                                                                      storage:
+                                                                                                      'localStorage',
+                                                                                                      // 多标签页同步
+                                                                                                      syncTabs: true,
+                                                                                                      // 过期时间（7天）
+                                                                                                      ttl: 7 * 24 * 60 *
+                                                                                                      60 * 1000,
+                                                                                                      // 选择性持久化（可选）
+                                                                                                      // paths:
+                                                                                                      ['data'],
+                                                                                                      // excludePaths:
+                                                                                                      ['loading',
+                                                                                                      'error'],
+                                                                                                      }
                                                                                                       }<% } %>)
